@@ -1,6 +1,6 @@
 //
 //  tp3_squelette.cpp
-//  
+//
 //
 //  Created by Caroline Larboulette on 16/10/2017.
 //
@@ -18,6 +18,7 @@
     #include <OpenGL/gl.h>
     #include <GLUT/glut.h>
 #endif
+
 bool matrixMode = true;
 int _width = 10;
 int _height = 10;
@@ -36,7 +37,7 @@ void display(void)
     glLineWidth(2.0);
 	glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-    
+
     glColor3f(1.0, 0.0, 0.0);
     glBegin(GL_LINES); //Draws x-axis
     glVertex3f(-_width,0,0);
@@ -48,7 +49,7 @@ void display(void)
     glVertex3f(0,-_height,0);
     glVertex3f(0,_height,0);
     glEnd();
-    
+
    if(matrixMode){
 		float t[16] = {
 			1, 0, 0, 0,
@@ -57,7 +58,7 @@ void display(void)
 			transH, transV, 0, 1
 		};
 		glMultMatrixf(t);
-		
+
 		float s[16] = {
 			scale, 0, 0, 0,
 			0, scale, 0, 0,
@@ -65,7 +66,7 @@ void display(void)
 			0, 0, 0, 1
 		};
 		glMultMatrixf(s);
-		
+
 		float r[16] = {
 			cos(rota*M_PI/180), sin(rota*M_PI/180), 0, 0,
 			-sin(rota*M_PI/180), cos(rota*M_PI/180), 0, 0,
@@ -73,14 +74,14 @@ void display(void)
 			0, 0, 0, 1
 		};
 		glMultMatrixf(r);
-			
+
 	}
 	else{
 		glTranslatef(transH,transV,0);
 		glScalef(scale,scale,0);
 		glRotatef(rota,0,0,1);
 	}
-	
+
 	glColor3f(1,1,1);
     glBegin(GL_POLYGON); //Draws polygon
     glVertex3f(1,1,0);
@@ -145,7 +146,7 @@ void keyboard(unsigned char key, int x, int y)
 		case 'e' : {
 			transH++;
 			break;
-			}		
+			}
 		case 'a' : {
 			transH--;
 			break;
@@ -153,7 +154,7 @@ void keyboard(unsigned char key, int x, int y)
 		case 'z' : {
 			transV++;
 			break;
-			}		
+			}
 		case 's' : {
 			transV--;
 			break;
@@ -176,7 +177,7 @@ void keyboard(unsigned char key, int x, int y)
 			}
         case 'q': exit(0); //exits the program
     }
-        
+
     display();
 }
 
