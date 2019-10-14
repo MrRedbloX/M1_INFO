@@ -44,15 +44,37 @@ mX1=mX[256:1024+256]
 #mX1=powerSpectra[100:256]
 plt.plot(F1,mX1)
 
-#fig2 = plt.figure()
-#plt.xlabel('Frequency [Hz]')
-#plt.ylabel('Phase')
-#F1=F[100:256]
-#pX1=pX[100:256]
-#plt.plot(F1,pX1)
+fig2 = plt.figure()
+plt.xlabel('Frequency [Hz]')
+plt.ylabel('Phase')
+F1=F[100:256]
+pX1=pX[100:256]
+plt.plot(F1,pX1)
 
 fig3 = plt.figure()
 f, t, Sxx = signal.spectrogram(x, fs)
 plt.pcolormesh(t, f, np.log(Sxx))
 plt.ylabel('Frequency [Hz]')
 plt.xlabel('Time [sec]')
+
+def calculerSpectre(echantillons,fs):
+    Nf = echantillons.size
+    F =np.linspace(0,fs,Nf)	
+    X=fft(echantillons)/Nf
+    return (F,X)
+
+def movingFFT(filename, winSize, offset, winType):
+    (fs,x) = read(filename)
+    Nf = x.size
+    sf = np.zeros(Nf)
+    sf[:]=x[offset:offset+Nf]
+    (F,X) = calculerSpectre(sf,fs)
+    plt.figure(figsize=(10,4)) 
+    X = X*signal.get_window(winType,Nf)
+    mX = 2*abs(X)
+    plt.plot(F[offset : winSize+offset], mX[offset : winSize+offset])
+    
+
+
+
+
