@@ -4,8 +4,8 @@
 //
 // Luc Courtrai
 
-#include<sys/time.h>
-#include<stdio.h>
+#include <sys/time.h>
+#include <stdio.h>
 
 int main(void) {
 
@@ -20,6 +20,6 @@ int main(void) {
   srandom(init);  // initialisation du generateur
 
   while ( i++ <10)
-    printf("%ld \n",random());  // genere un nombre aleatoire
+    printf("%ld \n",random()%10);  // genere un nombre aleatoire
 
 }
