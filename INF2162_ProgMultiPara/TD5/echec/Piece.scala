@@ -1,1 +1,3 @@
-trait Piece
+trait Piece{
+  def length : Int
+}
