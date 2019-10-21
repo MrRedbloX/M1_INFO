@@ -63,8 +63,8 @@ int main(int argc, char ** argv){
    semop(semid,&op,1);
 
    if((sem=(int *)shmat(shmid,0,0)) == (int*)-1){
-   fprintf(stderr, "Probleme sur shmat\n");
-   exit(5);
+	   fprintf(stderr, "Probleme sur shmat\n");
+	   exit(5);
    }
 
    op.sem_num=0;op.sem_op=1;op.sem_flg=0;
@@ -82,6 +82,10 @@ int main(int argc, char ** argv){
 		   sigprocmask(SIG_SETMASK, &set, NULL);
 
        //Partie 1 lecteur début
+       if((sem=(int *)shmat(shmid,0,0)) == (int*)-1){
+		   fprintf(stderr, "Probleme sur shmat\n");
+		   exit(5);
+		}
        op.sem_num=0;op.sem_op=-1;op.sem_flg=0;
        semop(semid,&op,1);
 
@@ -91,6 +95,11 @@ int main(int argc, char ** argv){
     	   semop(semid,&op,1);
     	   op.sem_num=1;op.sem_op=-1;op.sem_flg=0;
     	   semop(semid,&op,1);
+    	   
+    	   if((sem=(int *)shmat(shmid,0,0)) == (int*)-1){
+			   fprintf(stderr, "Probleme sur shmat\n");
+			   exit(5);
+			}
 
     	   op.sem_num=0;op.sem_op=-1;op.sem_flg=0;
     	   semop(semid,&op,1);
@@ -102,9 +111,13 @@ int main(int argc, char ** argv){
        op.sem_num=0;op.sem_op=1;op.sem_flg=0;
        semop(semid,&op,1);
        //Partie 1 lecteur fin
-
-		   op.sem_num=0;op.sem_op=-1;op.sem_flg=0;
-		   semop(semid,&op,1);
+       
+       if((sem=(int *)shmat(shmid,0,0)) == (int*)-1){
+		   fprintf(stderr, "Probleme sur shmat\n");
+		   exit(5);
+		}
+	   op.sem_num=0;op.sem_op=-1;op.sem_flg=0;
+	   semop(semid,&op,1);
 
        if((sem=(int *)shmat(shmid,0,0)) == (int*)-1){
          fprintf(stderr, "Probleme sur shmat\n");
@@ -114,10 +127,15 @@ int main(int argc, char ** argv){
        for(i=0; i<atoi(argv[1]);i++) printf("%d ", *(sem+5+i));
        printf("\r");
 
-		   op.sem_num=0;op.sem_op=1;op.sem_flg=0;
-		   semop(semid,&op,1);
+	   op.sem_num=0;op.sem_op=1;op.sem_flg=0;
+	   semop(semid,&op,1);
 
        //Partie 2 lecteur début
+       
+       if((sem=(int *)shmat(shmid,0,0)) == (int*)-1){
+		   fprintf(stderr, "Probleme sur shmat\n");
+		   exit(5);
+		}
        op.sem_num=0;op.sem_op=-1;op.sem_flg=0;
        semop(semid,&op,1);
 
@@ -131,9 +149,8 @@ int main(int argc, char ** argv){
        semop(semid,&op,1);
        //Partie 2 lecteur fin
 
-		   sigemptyset(&set);
-		   sigprocmask(SIG_SETMASK, &set, NULL);
-       sleep(1);
+	   sigemptyset(&set);
+	   sigprocmask(SIG_SETMASK, &set, NULL);
 	   }
 	}
 
@@ -150,8 +167,6 @@ int main(int argc, char ** argv){
   semop(semid,&op,1);
 
   pid_t pidRedac = *(sem+4);
-
-
 
   kill(pidRedac,SIGUSR1);
   kill(pid,SIGUSR1);

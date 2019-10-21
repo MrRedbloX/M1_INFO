@@ -148,21 +148,20 @@ int main (int argc, char ** argv) {
 
 	getchar();
 
-
 	for(i=0; i<atoi(argv[1])+1;i++){
 		//printf("Kill %d\n",tabPid[i]);
 		kill(tabPid[i],SIGUSR1);
 		wait(NULL);
 		sleep(1);
 	}
-
-	op.sem_num=0;op.sem_op=-1;op.sem_flg=0;
-	semop(semid,&op,1);
-
+	
 	if((sem=(int *)shmat(shmid,0,0)) == (int*)-1){
 		 fprintf(stderr, "Probleme sur shmat\n");
 		 exit(10);
 	 }
+
+	op.sem_num=0;op.sem_op=-1;op.sem_flg=0;
+	semop(semid,&op,1);
 
 	 int result[atoi(argv[1])];
 	 for(i=0; i<atoi(argv[1]);i++){

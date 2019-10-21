@@ -69,8 +69,8 @@ int main(int argc, char ** argv){
   semop(semid,&op,1);
 
   if((sem=(int *)shmat(shmid,0,0)) == (int*)-1){
-  fprintf(stderr, "Probleme sur shmat1\n");
-  exit(5);
+	  fprintf(stderr, "Probleme sur shmat1\n");
+	  exit(5);
   }
   *(sem+4) = getpid();
   op.sem_num=0;op.sem_op=1;op.sem_flg=0;
@@ -90,7 +90,11 @@ int main(int argc, char ** argv){
         sigaddset(&set,SIGUSR2);
         sigprocmask(SIG_SETMASK, &set, NULL);
         //Partie 1 rédacteur début
-
+        
+        if((sem=(int *)shmat(shmid,0,0)) == (int*)-1){
+		  fprintf(stderr, "Probleme sur shmat1\n");
+		  exit(5);
+		}
         op.sem_num=0;op.sem_op=-1;op.sem_flg=0;
        	semop(semid,&op,1);
        	if(*sem || *(sem+2) || *(sem+3)){
@@ -99,6 +103,11 @@ int main(int argc, char ** argv){
        		semop(semid,&op,1);
        		op.sem_num=2;op.sem_op=-1;op.sem_flg=0;
        		semop(semid,&op,1);
+       		
+       		if((sem=(int *)shmat(shmid,0,0)) == (int*)-1){
+			  fprintf(stderr, "Probleme sur shmat1\n");
+			  exit(5);
+			}
 
        		op.sem_num=0;op.sem_op=-1;op.sem_flg=0;
        		semop(semid,&op,1);
@@ -110,6 +119,11 @@ int main(int argc, char ** argv){
         op.sem_num=0;op.sem_op=1;op.sem_flg=0;
        	semop(semid,&op,1);
         //Partie 1 rédacteur fin
+        
+        if((sem=(int *)shmat(shmid,0,0)) == (int*)-1){
+		  fprintf(stderr, "Probleme sur shmat1\n");
+		  exit(5);
+		}
 
         op.sem_num=0;op.sem_op=-1;op.sem_flg=0;
         semop(semid,&op,1);
@@ -122,6 +136,11 @@ int main(int argc, char ** argv){
         usleep(200);
 
         //Partie 2 rédacteur début
+        
+        if((sem=(int *)shmat(shmid,0,0)) == (int*)-1){
+		  fprintf(stderr, "Probleme sur shmat1\n");
+		  exit(5);
+		}
 
        	op.sem_num=0;op.sem_op=-1;op.sem_flg=0;
        	semop(semid,&op,1);
@@ -147,6 +166,8 @@ int main(int argc, char ** argv){
 
         sigemptyset(&set);
         sigprocmask(SIG_SETMASK, &set, NULL);
+        
+        usleep(100);
       }
    }
   //Rouleau fin

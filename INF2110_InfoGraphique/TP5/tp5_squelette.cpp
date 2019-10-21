@@ -8,80 +8,40 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <math.h> 
+#include <math.h>
 
-#include </usr/include/GL/gl.h>
-#include </usr/include/GL/glut.h>
+#ifdef __gnu_linux__
+    #include <GL/freeglut.h>
+    #include <GL/gl.h>
+#else
+    #include <OpenGL/gl.h>
+    #include <GLUT/glut.h>
+#endif
 
 using namespace std;
 
 
-double viewingMatrix[16] = {
-	1.0, 	0.0, 	0.0, 	0.0,
-	0.0, 	0.0, 	1.0, 	0.0,
-	0.0, 	-100.0, 0.0, 	0.0,
-	0.0, 	0.0, 	0.0, 	1.0
-};
-
-double frustrumMatrix[16] = {
-	1.0,	0.0,	0.0,	0.0,
-	0.0,	1.0,	0.0,	0.0,
-	0.0,	0.0,	1.0,	1.0,
-	0.0,	0.0,	0.0,	0.0
-	
-};
-
-double perspectiveMatrix[16] = {
-	1.0,	0.0,	0.0,	0.0,
-	0.0,	1.0,	0.0,	0.0,
-	0.0,	0.0,	1.0,	2.0,
-	0.0,	0.0,	0.0,	0.0
-	
-};
-
-double orthoMatrix[16] = {
-	1.0,	0.0,	0.0,	0.0,
-	0.0,	1.0,	0.0,	0.0,
-	0.0,	0.0,	1.0,	1.0,
-	0.0,	0.0,	0.0,	0.0
-	
-};
-
-double angleRadian = 45*(M_PI/180);
-
-
-double R[16] = {
-	cos(angleRadian), 	0.0, 	sin(angleRadian), 	0.0,
-			0.0, 		1.0, 		0.0,			0.0,
-	-sin(angleRadian), 	0.0, 	cos(angleRadian),	0.0,
-			0.0,		0.0,		0.0,			1.0
-};
-
-double roll[] = {0.0,0.0,0.0};
-double pitch = 1.0;
-double heading[] = {8.0,0.0,42.0};
-double pos[] = {0.0,0.0,0.0};
+double posX,posY,posZ,lookAtY,roll1,roll2 = 0;
+double lookAtX = 8;
+double lookAtZ = 42;
+double pitch = 1;
 
 void drawHouse()
 {
-    //Add your code here !
     
-    //gluLookAt(/* Eye */8.0,0.0,84.0, /* Point que l'on regarde */ 8.0,0.0,42.0 /* Vecteur direction haut de la tête */,0.0,1.0,0.0); // 1 Point
-    //gluLookAt(32.0,8.0,84.0, 0.0,0.0,0.0 ,0.0,1.0,0.0); // 2 Point
-    //gluLookAt(32.0,32.0,84.0, 8.0,0.0,42.0 ,0.0,1.0,0.0); // 3 Point
+     //gluLookAt(/* Eye */8,0,84, /* Point que l'on regarde */ 8,0,42 /* Vecteur direction haut de la tête */,0,1,0); // 1 Point
+     //gluLookAt(32,8,84, 0,0,0,0,1,0); // 2 Point
+     //gluLookAt(32,32,86, 8,0,42 ,0,1,0); // 3 Point
     
 	glMatrixMode(GL_PROJECTION);
 	
-	/* Exercise 2 Frustum */
 	//glFrustum(-50.0,50.0, -50.0,50.0, 84.0,20.0);
+
+	gluPerspective(90.0,1.0,1.0,100.0);
    
-	/* Exercise 2 Perspective */
-	//gluPerspective(90.0,1.0,84.0,30.0);
-   
-	/* Exercise 2 Ortho */
-	glOrtho(-50.0,50.0,-50.0,50.0,84.0,20.0);
+	//glOrtho(-50.0,50.0,-50.0,50.0,84.0,20.0);
     
-    glColor3f(1.0, 1.0, 0.0);
+    glColor3f(0, 1, 1);
     glLineWidth(1.0);
     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     glBegin(GL_POLYGON); //Draws x-axis
@@ -109,32 +69,12 @@ void drawHouse()
     
 }
 
-/*void flightSimulator(double* roll, double pitch, double* heading){
-	
-	double headingx = heading[0];
-	//double headingy = heading[1];
-	double headingz = heading[1];
-	
-	double rollx = roll[0];
-	double rollz = roll[1];
-	
-	glLoadIdentity();
-	* */
-	//gluLookAt(/* Eye */8.0,0.0,84.0, /* Point que l'on regarde */ headingx,pitch,headingz /* Vecteur direction haut de la tête */,rollx,1.0,rollz);
-	/*
-}
-*/
 void display(void)
 {
     glClear(GL_COLOR_BUFFER_BIT);
     
     glLoadIdentity();
-    //gluLookAt(0,0,0,0,0,-100,0,1,0);// Add parameters here that are not default ones
-    gluLookAt(pos[0],pos[1],pos[2],heading[0],heading[1],heading[2],roll[0],pitch,roll[2]);// Add parameters here that are not default ones
-    
-    //glMultMatrixd(viewingMatrix);
-	//glMultMatrixd(frustrumMatrix);
-	//glMultMatrixd(R);
+    gluLookAt(posX,posY,posZ,lookAtX,lookAtY,lookAtZ,roll1,pitch,roll2);
    
     //Draw axes
     glColor3f(1.0, 0.0, 0.0);
@@ -155,9 +95,8 @@ void display(void)
     glVertex3f(0,0,-50);
     glVertex3f(0,0,50);
     glEnd();
-    //coucou c'est moi :)
-    drawHouse();
     
+    drawHouse();
     glFlush();
 }
 
@@ -175,8 +114,8 @@ void init(void)
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
     //perspective projection left right bottom top near far
-    //Change parameters to see your object
-    glFrustum(-50,50.0,-50.0,50.0,0,10);
+    //Change puarameters to see your object
+   // glFrustum(-50,50.0,-50.0,50.0,0,10);
     glMatrixMode(GL_MODELVIEW);
     
 }
@@ -187,97 +126,22 @@ void init(void)
  **/
 void keyboard(unsigned char key, int x, int y)
 {
-    switch (key)
-    {
-        case '7':{ 
-			roll[0] = roll[0]-0.1;
-			display();
-			break;
-			}
-		case '9':{ 
-			roll[0] = roll[0]+0.1;
-			display();
-			break;
-			}
-		case '4':{ 
-			heading[0] = heading[0]-1;
-			display();
-			break;
-			}
-		case '6':{ 
-			heading[0] = heading[0]+1;
-			display();
-			break;
-			}
-		case '8':{ display();
-			heading[1] = heading[1]+1;
-			display();
-			break;
-			}
-		case '2':{
-			heading[1] = heading[1]-1;
-			display();
-			break;
-			}
-		case '1':{
-			roll[2] = roll[2]-0.1;
-			display();
-			break;
-			}
-		case '3':{
-			roll[2] = roll[2]+0.1;
-			display();
-			break;
-			}
-		case '5':{ 
-			roll[0] = 0.0;
-			roll[1] = 0.0;
-			roll[2] = 0.0;
-			pitch = 1.0;
-			heading[0] = 8.0;
-			heading[1] = 0.0;
-			heading[2] = 42.0;
-			pos[0] = 0;
-			pos[1] = 0;
-			pos[2] = 0;
-			display();
-			break;
-			}
-		case 'z':{ 
-			pos[2] = pos[2] + 1;
-			display();
-			break;
-			}
-		case 's':{ 
-			pos[2] = pos[2] - 1;
-			display();
-			break;
-			}
-		case 'q': {
-			pos[0] = pos[0] + 1;
-			display();
-			break;
-			}
-		case 'd': {
-			pos[0] = pos[0] - 1;
-			display();
-			break;
-			}
-		case 'a': {
-			if(pitch == 1){
-				pitch = 0.5;
-			}
-			display();
-			break;
-			}
-		case 'e': {
-			if(pitch == 0.5){
-				pitch = 1;
-			}
-			display();
-			break;
-			}
+    switch (key){
+		case 'z' : posZ--; lookAtZ--; break;
+		case 's' : posZ++; lookAtZ++; break;
+		case 'a' : posX--; lookAtX--; break;
+		case 'e' : posX++; lookAtX++; break;
+		case 'u' : posY++; lookAtY++; break;
+		case 'd' : posY--; lookAtY--; break;
+		case 'p' : pitch++; break;
+		case 'h' : pitch--; break;
+		case 'r' : roll1++; break;
+		case 'f' : roll1--; break;
+		case 't' : roll2++; break;
+		case 'g' : roll2--; break;
+		case 'q' : exit(0);
     }
+    display();
 }
 
 int main(int argc, char** argv)
