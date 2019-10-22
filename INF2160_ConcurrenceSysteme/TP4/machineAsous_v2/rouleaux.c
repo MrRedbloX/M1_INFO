@@ -91,78 +91,70 @@ int main(int argc, char ** argv){
         sigprocmask(SIG_SETMASK, &set, NULL);
         //Partie 1 rédacteur début
         
-        if((sem=(int *)shmat(shmid,0,0)) == (int*)-1){
-		  fprintf(stderr, "Probleme sur shmat1\n");
-		  exit(5);
-		}
-        op.sem_num=0;op.sem_op=-1;op.sem_flg=0;
-       	semop(semid,&op,1);
-       	if(*sem || *(sem+2) || *(sem+3)){
-       		*(sem+3) = *(sem+3)+1; //DemandeRedacteur++
-       		op.sem_num=0;op.sem_op=1;op.sem_flg=0;
-       		semop(semid,&op,1);
-       		op.sem_num=2;op.sem_op=-1;op.sem_flg=0;
-       		semop(semid,&op,1);
-       		
-       		if((sem=(int *)shmat(shmid,0,0)) == (int*)-1){
-			  fprintf(stderr, "Probleme sur shmat1\n");
-			  exit(5);
+        if((sem=(int *)shmat(shmid,0,0)) != (int*)-1){
+			op.sem_num=0;op.sem_op=-1;op.sem_flg=0;
+			semop(semid,&op,1);
+			if(*sem || *(sem+2) || *(sem+3)){
+				*(sem+3) = *(sem+3)+1; //DemandeRedacteur++
+				op.sem_num=0;op.sem_op=1;op.sem_flg=0;
+				semop(semid,&op,1);
+				op.sem_num=2;op.sem_op=-1;op.sem_flg=0;
+				semop(semid,&op,1);
+
+				op.sem_num=0;op.sem_op=-1;op.sem_flg=0;
+				semop(semid,&op,1);
+
+				*(sem+3) = *(sem+3)-1; //DemandeRedacteur--;
 			}
 
-       		op.sem_num=0;op.sem_op=-1;op.sem_flg=0;
-       		semop(semid,&op,1);
+			*(sem+2) = *(sem+2)+1; //Redacteur++
+			op.sem_num=0;op.sem_op=1;op.sem_flg=0;
+			semop(semid,&op,1);
+			//Partie 1 rédacteur fin
+			
+			if((sem=(int *)shmat(shmid,0,0)) != (int*)-1){
 
-       		*(sem+3) = *(sem+3)-1; //DemandeRedacteur--;
-       	}
 
-       	*(sem+2) = *(sem+2)+1; //Redacteur++
-        op.sem_num=0;op.sem_op=1;op.sem_flg=0;
-       	semop(semid,&op,1);
-        //Partie 1 rédacteur fin
-        
-        if((sem=(int *)shmat(shmid,0,0)) == (int*)-1){
-		  fprintf(stderr, "Probleme sur shmat1\n");
-		  exit(5);
+				op.sem_num=0;op.sem_op=-1;op.sem_flg=0;
+				semop(semid,&op,1);
+
+				if(*(sem+5+i) == 9) *(sem+5+i) = 0;
+				else *(sem+5+i) = *(sem+5+i) + 1;
+
+				op.sem_num=0;op.sem_op=1;op.sem_flg=0;
+				semop(semid,&op,1);
+				usleep(200);
+			}
+
+			//Partie 2 rédacteur début
+			
+			if((sem=(int *)shmat(shmid,0,0)) != (int*)-1){
+
+
+
+				op.sem_num=0;op.sem_op=-1;op.sem_flg=0;
+				semop(semid,&op,1);
+
+				*(sem+2) = *(sem+2)-1; //Redacteur--
+
+				if(*(sem+3) != 0){
+					op.sem_num=2;op.sem_op=1;op.sem_flg=0;
+					semop(semid,&op,1);
+				}
+				else{
+					if(*(sem+1)){
+						int nb;
+						for(nb=0; nb<(*(sem+1)); nb++){
+							op.sem_num=1;op.sem_op=1;op.sem_flg=0;
+							semop(semid,&op,1);
+						}
+					}
+				}
+				op.sem_num=0;op.sem_op=1;op.sem_flg=0;
+				semop(semid,&op,1);
+				//Partie 2 rédacteur fin
+			}
 		}
-
-        op.sem_num=0;op.sem_op=-1;op.sem_flg=0;
-        semop(semid,&op,1);
-
-        if(*(sem+5+i) == 9) *(sem+5+i) = 0;
-        else *(sem+5+i) = *(sem+5+i) + 1;
-
-        op.sem_num=0;op.sem_op=1;op.sem_flg=0;
-        semop(semid,&op,1);
-        usleep(200);
-
-        //Partie 2 rédacteur début
-        
-        if((sem=(int *)shmat(shmid,0,0)) == (int*)-1){
-		  fprintf(stderr, "Probleme sur shmat1\n");
-		  exit(5);
-		}
-
-       	op.sem_num=0;op.sem_op=-1;op.sem_flg=0;
-       	semop(semid,&op,1);
-
-       	*(sem+2) = *(sem+2)-1; //Redacteur--
-
-       	if(*(sem+3) != 0){
-       		op.sem_num=2;op.sem_op=1;op.sem_flg=0;
-       		semop(semid,&op,1);
-       	}
-       	else{
-       		if(*(sem+1)){
-       			int nb;
-       			for(nb=0; nb<(*(sem+1)); nb++){
-       				op.sem_num=1;op.sem_op=1;op.sem_flg=0;
-       				semop(semid,&op,1);
-       			}
-       		}
-       	}
-       	op.sem_num=0;op.sem_op=1;op.sem_flg=0;
-       	semop(semid,&op,1);
-        //Partie 2 rédacteur fin
 
         sigemptyset(&set);
         sigprocmask(SIG_SETMASK, &set, NULL);

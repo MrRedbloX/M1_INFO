@@ -76,81 +76,68 @@ int main(int argc, char ** argv){
 	   actions.sa_handler = handler;
 	   rc = sigaction(SIGUSR2,&actions,NULL);
 	   while(1){
-		  // printf("PID f : %d\n",getpid());
+		   //printf("PID f : %d\n",getpid());
 		   sigemptyset(&set);
 		   sigaddset(&set,SIGUSR2);
 		   sigprocmask(SIG_SETMASK, &set, NULL);
 
-       //Partie 1 lecteur début
-       if((sem=(int *)shmat(shmid,0,0)) == (int*)-1){
-		   fprintf(stderr, "Probleme sur shmat\n");
-		   exit(5);
-		}
-       op.sem_num=0;op.sem_op=-1;op.sem_flg=0;
-       semop(semid,&op,1);
+		   //Partie 1 lecteur début
+		   if((sem=(int *)shmat(shmid,0,0)) != (int*)-1){
+			   op.sem_num=0;op.sem_op=-1;op.sem_flg=0;
+			   semop(semid,&op,1);
 
-       if(*(sem+2) || *(sem+3)){
-    	   *(sem+1) = *(sem+1)+1; //DemandeLecteur++
-    	   op.sem_num=0;op.sem_op=1;op.sem_flg=0;
-    	   semop(semid,&op,1);
-    	   op.sem_num=1;op.sem_op=-1;op.sem_flg=0;
-    	   semop(semid,&op,1);
-    	   
-    	   if((sem=(int *)shmat(shmid,0,0)) == (int*)-1){
-			   fprintf(stderr, "Probleme sur shmat\n");
-			   exit(5);
-			}
+			   if(*(sem+2) || *(sem+3)){
+				   *(sem+1) = *(sem+1)+1; //DemandeLecteur++
+				   op.sem_num=0;op.sem_op=1;op.sem_flg=0;
+				   semop(semid,&op,1);
+				   op.sem_num=1;op.sem_op=-1;op.sem_flg=0;
+				   semop(semid,&op,1);
 
-    	   op.sem_num=0;op.sem_op=-1;op.sem_flg=0;
-    	   semop(semid,&op,1);
+				   op.sem_num=0;op.sem_op=-1;op.sem_flg=0;
+				   semop(semid,&op,1);
 
-    	   *(sem+1) = *(sem+1)-1; //DemandeLecteur--
-       }
+				   *(sem+1) = *(sem+1)-1; //DemandeLecteur--
+			   }
 
-       *sem = *sem+1; //Lecteur++
-       op.sem_num=0;op.sem_op=1;op.sem_flg=0;
-       semop(semid,&op,1);
-       //Partie 1 lecteur fin
-       
-       if((sem=(int *)shmat(shmid,0,0)) == (int*)-1){
-		   fprintf(stderr, "Probleme sur shmat\n");
-		   exit(5);
-		}
-	   op.sem_num=0;op.sem_op=-1;op.sem_flg=0;
-	   semop(semid,&op,1);
+			   *sem = *sem+1; //Lecteur++
+			   op.sem_num=0;op.sem_op=1;op.sem_flg=0;
+			   semop(semid,&op,1);
+			   //Partie 1 lecteur fin
+			   
+			   if((sem=(int *)shmat(shmid,0,0)) != (int*)-1){
 
-       if((sem=(int *)shmat(shmid,0,0)) == (int*)-1){
-         fprintf(stderr, "Probleme sur shmat\n");
-         exit(5);
-       }
+				   op.sem_num=0;op.sem_op=-1;op.sem_flg=0;
+				   semop(semid,&op,1);
 
-       for(i=0; i<atoi(argv[1]);i++) printf("%d ", *(sem+5+i));
-       printf("\r");
+				   for(i=0; i<atoi(argv[1]);i++) printf("%d ", *(sem+5+i));
+				   printf("\r");
 
-	   op.sem_num=0;op.sem_op=1;op.sem_flg=0;
-	   semop(semid,&op,1);
+				   op.sem_num=0;op.sem_op=1;op.sem_flg=0;
+				   semop(semid,&op,1);
+			   }
 
-       //Partie 2 lecteur début
-       
-       if((sem=(int *)shmat(shmid,0,0)) == (int*)-1){
-		   fprintf(stderr, "Probleme sur shmat\n");
-		   exit(5);
-		}
-       op.sem_num=0;op.sem_op=-1;op.sem_flg=0;
-       semop(semid,&op,1);
+			   //Partie 2 lecteur début
+			   
+			   if((sem=(int *)shmat(shmid,0,0)) != (int*)-1){
 
-       *sem = *sem-1; //Lecteur--
+				   op.sem_num=0;op.sem_op=-1;op.sem_flg=0;
+				   semop(semid,&op,1);
 
-       if(*sem == 0 && *(sem+3)){
-    	   op.sem_num=2;op.sem_op=1;op.sem_flg=0;
-    	   semop(semid,&op,1);
-       }
-       op.sem_num=0;op.sem_op=1;op.sem_flg=0;
-       semop(semid,&op,1);
-       //Partie 2 lecteur fin
+				   *sem = *sem-1; //Lecteur--
 
-	   sigemptyset(&set);
-	   sigprocmask(SIG_SETMASK, &set, NULL);
+				   if(*sem == 0 && *(sem+3)){
+					   op.sem_num=2;op.sem_op=1;op.sem_flg=0;
+					   semop(semid,&op,1);
+				   }
+				   op.sem_num=0;op.sem_op=1;op.sem_flg=0;
+				   semop(semid,&op,1);
+			   }
+			   //Partie 2 lecteur fin
+		   }
+
+		   sigemptyset(&set);
+		   sigprocmask(SIG_SETMASK, &set, NULL);
+		   usleep(500);
 	   }
 	}
 
