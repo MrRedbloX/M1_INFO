@@ -8,6 +8,7 @@ class Echiquier[P <: Piece : ClassTag](cote_ : Int){
   override def toString() : String = {
     var ret : String = ""
     var size = this.plateau.toSeq.flatten.flatten.map(piece => piece.length).max //On récupère la taille max d'un mot
+    if(size < 5) size = 5
     ret = ret + Ansi.fblack+Ansi.black+(" "*(size-1))+Ansi.reset //On affiche l'échelle sur x
     for(i <- 0 to this.plateau.length-1) ret = ret + Ansi.fblack+Ansi.white+(" "*(size/4))+i.toString+(" "*(size-1))+Ansi.reset
     ret = ret + "\n"
