@@ -27,9 +27,8 @@ class CavalierEuler(cote_ : Int){
       var pasDejaPassePar : PartialFunction[Tuple2[Int,Int],Tuple2[Int,Int]] ={
         case e if(this.modele(e._1)(e._2) == 0) => e
       }
-      var listDeplacements = trouveDeplacementsCavalier(xy_)
-      this.heuristique(xy_._1)(xy_._2) = listDeplacements.size
-      listDeplacements = listDeplacements collect pasDejaPassePar
+      var listDeplacements = trouveDeplacementsCavalier(xy_) collect pasDejaPassePar
+      this.heuristique(xy_._1)(xy_._2) = listDeplacements.size;
       breakable{
         for(e <- listDeplacements){
           this.modele(e._1)(e._2) = etape_ + 1
@@ -43,11 +42,14 @@ class CavalierEuler(cote_ : Int){
     def synchroniseVueAuModele() : Unit ={
       for(i <- 0 to this.cote-1; j <- 0 to this.cote-1) vue((i,j)) = Some(PieceCol(this.modele(i)(j).toString))
     }
+    for(i <-0 to this.cote-1; j <- 0 to this.cote-1){
+	  this.heuristique(i)(j) = trouveDeplacementsCavalier((i,j)).size;
+	}
     this.modele(xyDepart_._1)(xyDepart_._2) = 1
     if(trouvePositions(xyDepart_,1)) println("Une solution a été trouvée.")
     else println("Pas de solution au problème.")
     synchroniseVueAuModele()
-    this.heuristique foreach {e => e foreach print _; println}
+    //this.heuristique foreach {e => e foreach print _; println}
   }
   override def toString() : String = this.vue.toString
 

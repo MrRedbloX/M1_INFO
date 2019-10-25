@@ -1,6 +1,6 @@
 object Main{
   def main(args : Array[String]) : Unit ={
-    val euler = new CavalierEuler(6)
+    val euler = new CavalierEuler(14)
     val timeStart = System.currentTimeMillis()
     euler.controller(0,0)
     val timeEnd = System.currentTimeMillis()
