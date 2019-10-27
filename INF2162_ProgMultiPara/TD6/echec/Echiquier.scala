@@ -10,13 +10,20 @@ class Echiquier[P <: Piece : ClassTag](cote_ : Int){
     var size = this.plateau.toSeq.flatten.flatten.map(piece => piece.length).max //On récupère la taille max d'un mot
     if(size < 5) size = 5
     ret = ret + Ansi.fblack+Ansi.black+(" "*(size-1))+Ansi.reset //On affiche l'échelle sur x
-    for(i <- 0 to this.plateau.length-1) ret = ret + Ansi.fblack+Ansi.white+(" "*(size/4))+i.toString+(" "*(size-1))+Ansi.reset
-    ret = ret + "\n"
-    ret = ret + Ansi.fblack+Ansi.black+"  "+Ansi.reset
+    var k : Int = 0;
+    for(i <- 0 to this.plateau.length-1){
+       if(i > 9) k = 1;
+       else k = 0;
+       ret = ret + Ansi.fblack+Ansi.white+(" "*(size/4))+i.toString+(" "*(size-1-k))+Ansi.reset
+     }
+    ret = ret + "\n" + Ansi.fblack+Ansi.black+"  "+Ansi.reset
     for(i <- 0 to this.plateau.length-1) ret = ret + Ansi.fblue+Ansi.blue+(" "*(size/4))+(" "*size)+Ansi.reset //On affiche les espaces bleus
     ret = ret + Ansi.fblue+Ansi.blue+(" "*(size/4))+Ansi.reset+Ansi.fblack+Ansi.black+" "+Ansi.reset+"\n"
+    k = 0;
     for(i <- 0 to this.plateau.length-1){
-      ret = ret + Ansi.fblack+Ansi.white+" "+i+Ansi.reset+Ansi.fblue+Ansi.blue+(" "*(size/4))+Ansi.reset //On affiche l'axe de y
+      if(i > 9) k = 1;
+      else k = 0;
+      ret = ret + Ansi.fblack+Ansi.white+(" "*(1-k))+i+Ansi.reset+Ansi.fblue+Ansi.blue+(" "*(size/4))+Ansi.reset //On affiche l'axe de y
       for(j <- 0 to this.plateau.length-1){
         this.plateau(i)(j) match{ //On affiche les pieces
           case None => ret = ret + Ansi.fblack+Ansi.black+(" "*size)+Ansi.reset
