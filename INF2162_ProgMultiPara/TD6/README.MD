@@ -1,4 +1,4 @@
-TD4 Anagramme par COGOLUEGNES Charles
+TD4 CavalierEuler par COGOLUEGNES Charles
 Execution : scala CavalierEuler.jar
 
 Temps d'exécution avant heuristique :
@@ -22,9 +22,19 @@ Pour preuve voici les temps d'exécution avec l'heuristique :
 11x11 : 0.201s
 12x12 : ?
 
-On observe une augmentation linéaire (sauf pour le 11x11 où l'on voit que le facteur "chance" est toujours présent).
+On observe une augmentation plus linéaire (sauf pour le 11x11 où l'on voit que le facteur "chance" est toujours présent).
 Néanmoins on pène à trouver une solution pour de plus grand échiquier.
 Cela vient du fait que plus l'échiquier est grand, plus l'heuristique actuel devient inutile.
 En effet la taille du carré composé de 8 au milieu augmente.
 
 On va donc modifier l'heuristique dynamiquement afin qu'il prenne en compte les étapes précédentes.
+On arrive donc aux résultats suivants :
+10x10 : 0.138s
+15x15 : 0.284s
+20x20 : 0.416s
+30x30 : 0.932s
+40x40 : ?
+60x6 : StackOverFlow
+(Il faut savoir que je fais tourner mon programme sur une VM avec moins de 4 Mo de RAM)
+
+Cette fois-ci les résultats sont beaucoup plus linéaire et le facteur chance disparait.
