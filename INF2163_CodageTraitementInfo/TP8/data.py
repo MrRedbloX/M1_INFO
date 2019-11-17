@@ -65,3 +65,42 @@ print(data.groupby('movie_id', axis=0)['rating'].count().hist(bins=10))
 plt.figure(3)
 plt.title("Histrogramme des notes moyennes des films")
 print(data.groupby('movie_id', axis=0)['rating'].median().hist(bins=10))
+map_id_to_count = data.groupby('movie_id')['rating'].count().to_dict()
+plt.figure(4)
+plt.title("Histrogramme des notes des films notés plus de 30 fois")
+# rajoute une variable comptant le nombre de votes par film
+data['movie_count'] = data['movie_id'].map(map_id_to_count)
+# changer kde par hist pour retrouver un histogramme et non une estimation de la densité
+data[data.movie_count >= 30].groupby('movie_id', axis=0)['rating'].mean().plot(kind='hist', color='b')
+data[data.movie_count <= 30].groupby('movie_id', axis=0)['rating'].mean().plot(kind='hist', color='g')
+#plt.figure(5)
+#plt.title("Moyenne des notes des films notés plus 100 fois hommes(b) vs femmes(g)")
+#axis = plt.gca()
+res = data[(data.gender == 'M') & (data.movie_count >= 100)].groupby('movie_id', axis=0)['rating'].median().to_frame()
+res.reset_index(inplace=True)
+res.columns = ['movie_id','rating']
+res = res.astype(float)
+res.plot(title='Moyenne notes films notés plus de 100 fois par les hommes',kind='scatter', x='rating', y='movie_id', c='b')
+res = data[(data.gender == 'F') & (data.movie_count >= 100)].groupby('movie_id', axis=0)['rating'].median().to_frame()
+res.reset_index(inplace=True)
+res.columns = ['movie_id','rating']
+res = res.astype(float)
+res.plot(title='Moyenne notes films notés plus de 100 fois par les femmes',kind='scatter', x='rating', y='movie_id', c='g')
+#plt.figure(6)
+#plt.title("Moyenne des notes des films notés moins 100 fois hommes(b) vs femmes(g)")
+#axis = plt.gca()
+res = data[(data.gender == 'M') & (data.movie_count < 100)].groupby('movie_id', axis=0)['rating'].median().to_frame()
+res.reset_index(inplace=True)
+res.columns = ['movie_id','rating']
+res = res.astype(float)
+res.plot(title='Moyenne notes films notés moins de 100 fois par les hommes',kind='scatter', x='rating', y='movie_id', c='b')
+res = data[(data.gender == 'F') & (data.movie_count < 100)].groupby('movie_id', axis=0)['rating'].median().to_frame()
+res.reset_index(inplace=True)
+res.columns = ['movie_id','rating']
+res = res.astype(float)
+res.plot(title='Moyenne notes films notés moins de 100 fois par les femmes',kind='scatter', x='rating', y='movie_id', c='g')
+print("On remarque que les femmes ont tendance à attribuer plus souvent une très bonne note au film que les hommes.")
+print("Elles ont tendance aussi à attribuer moins de mauvaises notes que les hommes.")
+
+
+
