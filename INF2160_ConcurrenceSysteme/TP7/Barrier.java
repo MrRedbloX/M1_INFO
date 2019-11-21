@@ -1,13 +1,13 @@
 public class Barrier {
-	private int nbThread;
+	private int nbThreads;
 	private int count;
-	public Barrier(int nbThread){
-		this.nbThread = nbThread;
+	public Barrier(int nbThreads){
+		this.nbThreads = nbThreads;
 		this.count = 0;
 	}
 	public synchronized void synchr(){
-		if(count < this.nbThread-1){
-			this.count++;
+		this.count++;
+		if(count < this.nbThreads){
 			try{
 				wait();
 			}
@@ -16,15 +16,14 @@ public class Barrier {
 			}
 		}
 		else{
-			System.out.println(nbThread);
 			try{
-				Thread.sleep(1000);
+				Thread.sleep(500);
 			}
 			catch (InterruptedException ie){
 				ie.printStackTrace();
 			 }
+			 count = 0;
 			notifyAll();
-			count = 0;
 		}
 	}
 }

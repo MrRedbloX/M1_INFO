@@ -1,25 +1,20 @@
 public class SuiteMot{
 	public static void main(String args[]){
-		Word first = null;
-		Word current = null;
 		Barrier bar = new Barrier(args.length);
-		for(int i=0; i<args.length; i++){
-			if(i == 0){
-				first = new Word(args[i],bar);
-				current = first;
-			}
-			else{
-				Word tmp = new Word(args[i],bar);
-				current.setNextThread(tmp);
-				current = tmp;
-				if(i == args.length-1){
-					 current.setNextThread(first);
-					 synchronized(first){
-						first.notify();
-					}
+		Word first = new Word(args[0],bar);
+		Word current = first;
+		current.start();
+		for(int i=1; i<args.length; i++){
+			Word tmp = new Word(args[i],bar);
+			current.setNextThread(tmp);
+			current = tmp;
+			current.start();
+			if(i == args.length-1){
+				 current.setNextThread(first);
+				 synchronized(first){
+					first.notify();
 				}
 			}
-			current.start();
 		}
 	}
 }
@@ -45,7 +40,7 @@ class Word extends Thread{
 				}
 				System.out.println(this.word);
 				try{
-					Thread.sleep(1000);
+					Thread.sleep(500);
 				}
 				catch (InterruptedException ie){
 					ie.printStackTrace();
