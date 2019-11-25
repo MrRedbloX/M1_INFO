@@ -1,6 +1,13 @@
 class Labyrinthe(init_ : Array[Array[Int]]){
   override def toString = {
-    init_.map(_.mkString(" ")).mkString("\n")
+    init_.map(l => l.map(e =>{
+      e match{
+        case 0 => s"${Ansi.fblack}   ${Ansi.reset}"
+        case 1 => s"${Ansi.fyellow}   ${Ansi.reset}"
+        case 2 => s"${Ansi.fblue}   ${Ansi.reset}"
+        case 9 => s"${Ansi.fred}   ${Ansi.reset}"
+      }
+    }).mkString()).mkString("\n")
   }
   def cheminSortieAPartirDe(pos_ : (Int,Int), lab_ : Array[Array[Int]] = init_) : Set[Array[Array[Int]]] = {
     val (x,y) = pos_
