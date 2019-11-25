@@ -7,7 +7,7 @@ class Labyrinthe(init_ : Array[Array[Int]]){
         case 2 => s"${Ansi.fblue}   ${Ansi.reset}"
         case 9 => s"${Ansi.fred}   ${Ansi.reset}"
       }
-    }).mkString()).mkString("\n")
+    }).mkString("")).mkString("\n")
   }
   def cheminSortieAPartirDe(pos_ : (Int,Int), lab_ : Array[Array[Int]] = init_) : Set[Array[Array[Int]]] = {
     val (x,y) = pos_
@@ -123,8 +123,7 @@ object Labyrinthe{
       $(1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,9,1)
     )
     val laby = new Labyrinthe(m3)
-    //print(laby)
-    //println()
+    print(laby + "\n\n")
     laby.cheminSortieAPartirDe((0,1)).foreach(s => print((new Labyrinthe(s).toString)+ "\n\n"))
   }
 }
