@@ -1,21 +1,21 @@
 <!DOCTYPE QGLVIEWER>
 <QGLViewer version="2.7.1">
   <State stereo="false">
-    <foregroundColor blue="180" red="180" green="180"/>
-    <backgroundColor blue="51" red="51" green="51"/>
+    <foregroundColor red="180" blue="180" green="180"/>
+    <backgroundColor red="51" blue="51" green="51"/>
   </State>
-  <Display cameraIsEdited="false" axisIsDrawn="true" FPSIsDisplayed="false" gridIsDrawn="false"/>
-  <Geometry posX="710" posY="295" fullScreen="false" width="600" height="400"/>
+  <Display gridIsDrawn="false" FPSIsDisplayed="false" axisIsDrawn="false" cameraIsEdited="false"/>
+  <Geometry height="400" fullScreen="false" posX="226" posY="24" width="600"/>
   <Camera>
-    <Parameters zClippingCoefficient="1.73205" sceneRadius="20" orthoCoef="0.414214" Type="PERSPECTIVE" zNearCoefficient="0.005" fieldOfView="0.785398">
+    <Parameters zClippingCoefficient="1.73205" zNearCoefficient="0.005" sceneRadius="500" orthoCoef="0.414214" Type="PERSPECTIVE" fieldOfView="0.785398">
       <SceneCenter x="0" y="0" z="0"/>
     </Parameters>
-    <Stereo IODist="0.062" physScreenWidth="0.5" focusDistance="48.2843"/>
+    <Stereo focusDistance="1207.11" IODist="0.062" physScreenWidth="0.5"/>
     <ManipulatedCameraFrame>
-      <position x="5.73397" y="-0.63024" z="1.76977"/>
-      <orientation q2="-0.0543743" q3="0.786995" q0="0.130071" q1="0.600636"/>
-      <ManipulatedParameters rotSens="1" spinSens="0.3" wheelSens="1" zoomSens="1" transSens="1"/>
-      <ManipulatedCameraParameters rotatesAroundUpVector="false" flySpeed="0.2" zoomsOnPivotPoint="false">
+      <position x="-37.2023" y="16.3139" z="6.31992"/>
+      <orientation q1="-0.574085" q2="-0.205744" q3="0.790567" q0="0.0556775"/>
+      <ManipulatedParameters transSens="1" rotSens="1" spinSens="0.3" wheelSens="1" zoomSens="1"/>
+      <ManipulatedCameraParameters rotatesAroundUpVector="false" flySpeed="5" zoomsOnPivotPoint="false">
         <sceneUpVector x="0" y="1" z="0"/>
       </ManipulatedCameraParameters>
     </ManipulatedCameraFrame>

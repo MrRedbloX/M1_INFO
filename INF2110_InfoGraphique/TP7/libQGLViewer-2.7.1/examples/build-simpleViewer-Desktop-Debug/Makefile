@@ -50,10 +50,18 @@ OBJECTS_DIR   = .obj/
 
 ####### Files
 
-SOURCES       = ../simpleViewer/simpleViewer.cpp \
-		../simpleViewer/main.cpp 
-OBJECTS       = .obj/simpleViewer.o \
-		.obj/main.o
+SOURCES       = ../simpleViewer/main.cpp \
+		../simpleViewer/glm.cpp \
+		../simpleViewer/view.cpp \
+		../simpleViewer/face.cpp \
+		../simpleViewer/objparser.cpp \
+		../simpleViewer/vertex.cpp 
+OBJECTS       = .obj/main.o \
+		.obj/glm.o \
+		.obj/view.o \
+		.obj/face.o \
+		.obj/objparser.o \
+		.obj/vertex.o
 DIST          = /usr/lib64/qt5/mkspecs/features/spec_pre.prf \
 		/usr/lib64/qt5/mkspecs/common/unix.conf \
 		/usr/lib64/qt5/mkspecs/common/linux.conf \
@@ -129,8 +137,16 @@ DIST          = /usr/lib64/qt5/mkspecs/features/spec_pre.prf \
 		/usr/lib64/qt5/mkspecs/features/exceptions.prf \
 		/usr/lib64/qt5/mkspecs/features/yacc.prf \
 		/usr/lib64/qt5/mkspecs/features/lex.prf \
-		../simpleViewer/simpleViewer.pro ../simpleViewer/simpleViewer.h ../simpleViewer/simpleViewer.cpp \
-		../simpleViewer/main.cpp
+		../simpleViewer/simpleViewer.pro ../simpleViewer/glm.h \
+		../simpleViewer/face.h \
+		../simpleViewer/objparser.h \
+		../simpleViewer/vertex.h \
+		../simpleViewer/view.h ../simpleViewer/main.cpp \
+		../simpleViewer/glm.cpp \
+		../simpleViewer/view.cpp \
+		../simpleViewer/face.cpp \
+		../simpleViewer/objparser.cpp \
+		../simpleViewer/vertex.cpp
 QMAKE_TARGET  = simpleViewer
 DESTDIR       = 
 TARGET        = simpleViewer
@@ -322,8 +338,8 @@ distdir: FORCE
 	@test -d $(DISTDIR) || mkdir -p $(DISTDIR)
 	$(COPY_FILE) --parents $(DIST) $(DISTDIR)/
 	$(COPY_FILE) --parents /usr/lib64/qt5/mkspecs/features/data/dummy.cpp $(DISTDIR)/
-	$(COPY_FILE) --parents ../simpleViewer/simpleViewer.h $(DISTDIR)/
-	$(COPY_FILE) --parents ../simpleViewer/simpleViewer.cpp ../simpleViewer/main.cpp $(DISTDIR)/
+	$(COPY_FILE) --parents ../simpleViewer/glm.h ../simpleViewer/face.h ../simpleViewer/objparser.h ../simpleViewer/vertex.h ../simpleViewer/view.h $(DISTDIR)/
+	$(COPY_FILE) --parents ../simpleViewer/main.cpp ../simpleViewer/glm.cpp ../simpleViewer/view.cpp ../simpleViewer/face.cpp ../simpleViewer/objparser.cpp ../simpleViewer/vertex.cpp $(DISTDIR)/
 
 
 clean: compiler_clean 
@@ -371,7 +387,7 @@ compiler_clean: compiler_moc_predefs_clean
 
 ####### Compile
 
-.obj/simpleViewer.o: ../simpleViewer/simpleViewer.cpp ../simpleViewer/simpleViewer.h \
+.obj/main.o: ../simpleViewer/main.cpp ../simpleViewer/view.h \
 		../../QGLViewer/qglviewer.h \
 		../../QGLViewer/camera.h \
 		../../QGLViewer/keyFrameInterpolator.h \
@@ -379,19 +395,67 @@ compiler_clean: compiler_moc_predefs_clean
 		../../QGLViewer/vec.h \
 		../../QGLViewer/config.h \
 		../../QGLViewer/frame.h \
-		../../QGLViewer/constraint.h
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o .obj/simpleViewer.o ../simpleViewer/simpleViewer.cpp
-
-.obj/main.o: ../simpleViewer/main.cpp ../simpleViewer/simpleViewer.h \
-		../../QGLViewer/qglviewer.h \
-		../../QGLViewer/camera.h \
-		../../QGLViewer/keyFrameInterpolator.h \
-		../../QGLViewer/quaternion.h \
-		../../QGLViewer/vec.h \
-		../../QGLViewer/config.h \
-		../../QGLViewer/frame.h \
-		../../QGLViewer/constraint.h
+		../../QGLViewer/constraint.h \
+		../simpleViewer/vertex.h \
+		../simpleViewer/face.h \
+		../simpleViewer/objparser.h \
+		../simpleViewer/glm.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o .obj/main.o ../simpleViewer/main.cpp
+
+.obj/glm.o: ../simpleViewer/glm.cpp ../simpleViewer/glm.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o .obj/glm.o ../simpleViewer/glm.cpp
+
+.obj/view.o: ../simpleViewer/view.cpp ../simpleViewer/view.h \
+		../../QGLViewer/qglviewer.h \
+		../../QGLViewer/camera.h \
+		../../QGLViewer/keyFrameInterpolator.h \
+		../../QGLViewer/quaternion.h \
+		../../QGLViewer/vec.h \
+		../../QGLViewer/config.h \
+		../../QGLViewer/frame.h \
+		../../QGLViewer/constraint.h \
+		../simpleViewer/vertex.h \
+		../simpleViewer/face.h \
+		../simpleViewer/objparser.h \
+		../simpleViewer/glm.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o .obj/view.o ../simpleViewer/view.cpp
+
+.obj/face.o: ../simpleViewer/face.cpp ../simpleViewer/face.h \
+		../../QGLViewer/qglviewer.h \
+		../../QGLViewer/camera.h \
+		../../QGLViewer/keyFrameInterpolator.h \
+		../../QGLViewer/quaternion.h \
+		../../QGLViewer/vec.h \
+		../../QGLViewer/config.h \
+		../../QGLViewer/frame.h \
+		../../QGLViewer/constraint.h \
+		../simpleViewer/vertex.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o .obj/face.o ../simpleViewer/face.cpp
+
+.obj/objparser.o: ../simpleViewer/objparser.cpp ../simpleViewer/objparser.h \
+		../../QGLViewer/qglviewer.h \
+		../../QGLViewer/camera.h \
+		../../QGLViewer/keyFrameInterpolator.h \
+		../../QGLViewer/quaternion.h \
+		../../QGLViewer/vec.h \
+		../../QGLViewer/config.h \
+		../../QGLViewer/frame.h \
+		../../QGLViewer/constraint.h \
+		../simpleViewer/vertex.h \
+		../simpleViewer/face.h \
+		../simpleViewer/glm.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o .obj/objparser.o ../simpleViewer/objparser.cpp
+
+.obj/vertex.o: ../simpleViewer/vertex.cpp ../simpleViewer/vertex.h \
+		../../QGLViewer/qglviewer.h \
+		../../QGLViewer/camera.h \
+		../../QGLViewer/keyFrameInterpolator.h \
+		../../QGLViewer/quaternion.h \
+		../../QGLViewer/vec.h \
+		../../QGLViewer/config.h \
+		../../QGLViewer/frame.h \
+		../../QGLViewer/constraint.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o .obj/vertex.o ../simpleViewer/vertex.cpp
 
 ####### Install
 
