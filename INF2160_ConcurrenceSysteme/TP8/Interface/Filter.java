@@ -5,7 +5,7 @@ package messagebox;
  * pour filtrer les message d'une MessageBox
  */
 /**
-   *   class Filter 
+   *   class Filter
    *  pour filtere les Message d'une  MessageBox
    */
 public class Filter{
@@ -19,7 +19,7 @@ public class Filter{
   }
 
   /**
-   *  le plus viel objet de la MessageBox 
+   *  le plus viel objet de la MessageBox
    *         venant d'un thread particulier
    *@param emt thread emetteur du message
    **/
@@ -29,8 +29,8 @@ public class Filter{
 
   /**
    * applique le filtre sur un message
-   *@param mes le message a tester 
-   *@return true si le message correspond au filtre courant  
+   *@param mes le message a tester
+   *@return true si le message correspond au filtre courant
    */
   public boolean isGood(Message mes){
 	  boolean result=false;

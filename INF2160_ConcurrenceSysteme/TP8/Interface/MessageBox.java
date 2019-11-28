@@ -3,7 +3,6 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import messagebox.Filter;
 import messagebox.Message;
-import java.util.concurrent.Semaphore;
 /**
  * class MessageBox
  *  boite aux lettres
@@ -12,74 +11,76 @@ import java.util.concurrent.Semaphore;
 public class MessageBox {
 	private LinkedList<Message> tampon;
 	private HashMap<Thread,Filter> blockThreads;
-	private Semaphore sMutex,sPlaceLibre,sArticle;
-	
+
   /**
    * constructeur
    **/
   public MessageBox(){
-	  blockThreads = new ArrayList<Thread>();
-	  tampon = new LinkedList<Message>();
-	  sMutex = new Semaphore(1,true);
-	  sPlaceLibre = new Semaphore(taille,true);// true FIFO
-	  sArticle = new Semaphore(0,true);
+	  this.blockThreads = new HashMap<Thread,Filter>();
+	  this.tampon = new LinkedList<Message>();
    };
-
 
   /**
    * Depose un message dans la boite aux lettres
    *@param mes le message a deposer
    **/
-   public  void  deposit(Message mes){
-	   sPlaceLibre.acquireUninterruptibly();
-	   sMutex.acquireUninterruptibly();
-	   tampon.add(mes);
-	   sMutex.release();
-	   sArticle.release();
-	   for(Thread t : blockThreads.keySet(){
-		   if(blockThreads.get(t).isGood(mes) t.notify();
-	   }
+   public void deposit(Message mes){
+		 synchronized(this.tampon){
+		   this.tampon.add(mes);
+			 synchronized(this.blockThreads){
+			   for(Thread t : this.blockThreads.keySet()) {
+				   if(this.blockThreads.get(t).isGood(mes)){
+						 synchronized(t){
+							 t.notify();
+							 this.blockThreads.remove(t);
+						 }
+						 break;
+					 }
+			   }
+			 }
+		 }
    }
 
   /**
-   * extrait le plus viel objet dans la MessageBox 
+   * extrait le plus viel objet dans la MessageBox
    *         correspondant a un fitre
    *@param f filtre a appliquer (eventuellement null)
    *@return le message extrait
    **/
-   public  Message receive(Filter f){
-	   if(!tryReceive(f)) {
-		   blockThreads.put(Thread.currentThread(),f);
-		   Thread.currentThread().wait();
+   public Message receive(Filter f){
+		 Message ret = tryReceive(f);
+	   while(ret == null){
+			 synchronized(Thread.currentThread()){
+				 try{
+					 blockThreads.put(Thread.currentThread(),f);
+					 Thread.currentThread().wait();
+					 ret = tryReceive(f);
+				 }
+			 	 catch(InterruptedException ie){
+					 ie.printStackTrace();
+				 }
+			 }
 	   }
-	   sArticle.acquireUninterruptibly();
-	   sMutex.acquireUninterruptibly();
-	   Message obj = null;
-	   for(Message m : tampon){
-		   if(f.isGood(m)){
-			   obj = m;
-			   break;
-		   }
-	   }
-	   sMutex.release();
-	   sPlaceLibre.release();
-	   return obj;
+	   return ret;
    }
 
  /**
    * test si la MessageBox contient un message qui
    *         repond a un fitre donne
-   *@param f filtre a appliquer (eventuellement null)
+   *@param f filtre a appliquer (dont l'emt peut être éventuellement null)
    *@return Message  en cas de succes (null sinon)
    **/
-   private  boolean tryReceive(Filter f){
-	   for(Message m : tampon){
-		   if(f.isGood(m)) return true;
-	   }
-	   return false;
-   };
-
-
-
+   private Message tryReceive(Filter f){
+		 Message ret = null;
+		 synchronized(this.tampon){
+		   for(Message m : this.tampon){
+			   if(f.isGood(m)){
+					  ret =  m;
+						this.tampon.remove(m);
+						break;
+					}
+		   }
+	 	 }
+	   return ret;
+   }
 }
-

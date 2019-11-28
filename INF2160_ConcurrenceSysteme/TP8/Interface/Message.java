@@ -6,19 +6,21 @@ package messagebox;
 
 public class Message{
 	private Object message;
+	private Thread sender;
    /**
    * constructeur
    *@ o :  object data du messae
    */
     public Message(Object o){
 		this.message = o;
+		this.sender = Thread.currentThread();
    }
 
   /**
    * extrait l'objet du message
    *@return objet
    */
-    public Object getObject(){     
+    public Object getObject(){
 	    return this.message;
     };
 
@@ -27,11 +29,9 @@ public class Message{
    *@return Thread
    */
     public Thread getSender(){
-	    return Thread.currentThread();
+	    return this.sender;
     };
 
 
 
 }
-
-
