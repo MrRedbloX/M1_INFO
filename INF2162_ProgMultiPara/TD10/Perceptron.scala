@@ -24,11 +24,11 @@ class Perceptron(couches_ : $[Int]){
     var cS = couches_.length - 1 //Couche de sortie
     for(i <- 1 until couches_.length){
       for(j <- 0 until couches_(i)){
-        if(i == cS) dI(i)(j) = 2 * (observe_(j)-souhaite_(j)) * Perceptron.fp(iI(i)(j))
+        if(i == cS) dI(i)(j) = 2 * (observe_(j)-souhaite_(j)) * Perceptron.fp(iI(i)(j)) //Le cas particulier
         else{
           var sum = 0.0
           for(h <- 0 until couches_(i+1)){
-            sum = sum + (dI(i+1)(h) + poids(i)(h)(j)) //La somme des h
+            sum = sum + (dI(i+1)(h) * poids(i)(h)(j)) //La somme des h
           }
           dI(i)(j) = sum * Perceptron.fp(iI(i)(j))
         }
