@@ -6,7 +6,7 @@ class Perceptron(couches_ : $[Int]){
   var oI = (0 until couches_.length).map(i => new $[Double](couches_(i))).toArray
   var iI = (0 until couches_.length).map(i => new $[Double](couches_(i))).toArray
   var dI = (0 until couches_.length).map(i => new $[Double](couches_(i))).toArray
-  var poids = (1 until couches_.length).map(i => Array.fill[Double](couches_(i), couches_(i-1))(1 - 2 * Math.random())).toArray
+  var poids = (1 until couches_.length).map(i => Array.fill[Double](couches_(i), couches_(i-1)){1 - 2 * Math.random()}).toArray
   def apply(in_ : $[Double]) : $[Double] = {
     require(in_.length == couches_(0), "Both vectors need to have to same length")
     for(i <- 0 until couches_(0)){ //On remplie les entrées
@@ -24,15 +24,17 @@ class Perceptron(couches_ : $[Int]){
   def apprentissage(data_ : List[Tuple2[X,Y]], tolerance_ : Double = 0.05, nbItMax_ : Int = 50000) : Unit = {
     def retroPropag(observe_ : $[Double], souhaite_ : $[Double], pas_ : Double = 0.1) : Unit = {
       //Traitement de la première couche
-      for(j <- couches_(couches_.length-1)-1 to 0 by -1){
+      for(j <- 0 until couches_(couches_.length-1)){
         this.dI(couches_.length-1)(j) = 2 * (observe_(j)-souhaite_(j)) * Perceptron.fp(this.iI(couches_.length-1)(j)) //Le cas particulier de la couche de sortie
-        for(k <- couches_(couches_.length-2) - 1 to 0 by -1) this.poids(couches_.length-2)(j)(k) = this.poids(couches_.length-2)(j)(k) - (pas_ * this.dI(couches_.length-1)(j) * this.oI(couches_.length-2)(k)) //La correction des poids
+        for(k <- 0 until couches_(couches_.length-2)) this.poids(couches_.length-2)(j)(k) = this.poids(couches_.length-2)(j)(k) - (pas_ * this.dI(couches_.length-1)(j) * this.oI(couches_.length-2)(k)) //La correction des poids
       }
       //Traitement des couches suivantes
       for(i <- couches_.length-2 to 1 by -1){
-        for(j <- couches_(i)-1 to 0 by -1){
-          for(h <- couches_(i+1)-1 to j by -1) this.dI(i)(j) = this.dI(i)(j) + (this.dI(i+1)(h) * this.poids(i)(h)(j) * Perceptron.fp(this.iI(i)(j))) //La somme des h
-          for(k <- couches_(i-1) - 1 to 0 by -1) this.poids(i-1)(j)(k) = this.poids(i-1)(j)(k) - (pas_ * this.dI(i)(j) * this.oI(i-1)(k)) //La correction des poids
+        for(j <- 0 until couches_(i)){
+          var s = 0.0
+          for(h <- 0 until couches_(i+1)) s = s + this.dI(i+1)(h) * this.poids(i)(h)(j) //La somme des h
+          this.dI(i)(j) = s * Perceptron.fp(this.iI(i)(j))
+          for(k <- 0 until couches_(i-1)) this.poids(i-1)(j)(k) = this.poids(i-1)(j)(k) - (pas_ * this.dI(i)(j) * this.oI(i-1)(k)) //La correction des poids
         }
       }
     }
@@ -67,12 +69,14 @@ object Perceptron{
   }
   def apply(couches_ : Int*) : Perceptron = new Perceptron(couches_.toArray)
   def main(args : $[String]) : Unit = {
-    val tolerance = 0.01
-    val dataAnd = List[Tuple2[X,Y]]((X($[Double](0,0,1)),Y($[Double](-1))),(X($[Double](0,1,1)),Y($[Double](-1))),(X($[Double](1,0,1)),Y($[Double](-1))),(X($[Double](1,1,1)),Y($[Double](1))))
-    val dataOr = List[Tuple2[X,Y]]((X($[Double](0,0,1)),Y($[Double](-1))),(X($[Double](0,1,1)),Y($[Double](1))),(X($[Double](1,0,1)),Y($[Double](1))),(X($[Double](1,1,1)),Y($[Double](1))))
-    val dataXOr = List[Tuple2[X,Y]]((X($[Double](0,0,1)),Y($[Double](-1))),(X($[Double](0,1,1)),Y($[Double](1))),(X($[Double](1,0,1)),Y($[Double](1))),(X($[Double](1,1,1)),Y($[Double](-1))))
-    val perceptron = Perceptron(3,1)
-    perceptron.apprentissage(dataOr, 0.0001, 200000)
+    val dataAndSig = List[Tuple2[X,Y]]((X($[Double](0,0,1)),Y($[Double](0))),(X($[Double](0,1,1)),Y($[Double](0))),(X($[Double](1,0,1)),Y($[Double](0))),(X($[Double](1,1,1)),Y($[Double](1))))
+    val dataOrSig = List[Tuple2[X,Y]]((X($[Double](0,0,1)),Y($[Double](0))),(X($[Double](0,1,1)),Y($[Double](1))),(X($[Double](1,0,1)),Y($[Double](1))),(X($[Double](1,1,1)),Y($[Double](1))))
+    val dataXOrSig = List[Tuple2[X,Y]]((X($[Double](0,0,1)),Y($[Double](0))),(X($[Double](0,1,1)),Y($[Double](1))),(X($[Double](1,0,1)),Y($[Double](1))),(X($[Double](1,1,1)),Y($[Double](0))))
+    val dataAndTanHyp = List[Tuple2[X,Y]]((X($[Double](0,0,1)),Y($[Double](-1))),(X($[Double](0,1,1)),Y($[Double](-1))),(X($[Double](1,0,1)),Y($[Double](-1))),(X($[Double](1,1,1)),Y($[Double](1))))
+    val dataOrTanHyp = List[Tuple2[X,Y]]((X($[Double](0,0,1)),Y($[Double](-1))),(X($[Double](0,1,1)),Y($[Double](1))),(X($[Double](1,0,1)),Y($[Double](1))),(X($[Double](1,1,1)),Y($[Double](1))))
+    val dataXOrTanHyp = List[Tuple2[X,Y]]((X($[Double](0,0,1)),Y($[Double](-1))),(X($[Double](0,1,1)),Y($[Double](1))),(X($[Double](1,0,1)),Y($[Double](1))),(X($[Double](1,1,1)),Y($[Double](-1))))
+    val perceptron = Perceptron(3,5,1)
+    perceptron.apprentissage(dataXOrTanHyp, 0.001, 200000)
     println(perceptron($[Double](0,0,1)).toList)
     println(perceptron($[Double](0,1,1)).toList)
     println(perceptron($[Double](1,0,1)).toList)
