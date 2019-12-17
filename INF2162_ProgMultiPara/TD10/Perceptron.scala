@@ -75,7 +75,7 @@ object Perceptron{
     val dataAndTanHyp = List[Tuple2[X,Y]]((X($[Double](0,0,1)),Y($[Double](-1))),(X($[Double](0,1,1)),Y($[Double](-1))),(X($[Double](1,0,1)),Y($[Double](-1))),(X($[Double](1,1,1)),Y($[Double](1))))
     val dataOrTanHyp = List[Tuple2[X,Y]]((X($[Double](0,0,1)),Y($[Double](-1))),(X($[Double](0,1,1)),Y($[Double](1))),(X($[Double](1,0,1)),Y($[Double](1))),(X($[Double](1,1,1)),Y($[Double](1))))
     val dataXOrTanHyp = List[Tuple2[X,Y]]((X($[Double](0,0,1)),Y($[Double](-1))),(X($[Double](0,1,1)),Y($[Double](1))),(X($[Double](1,0,1)),Y($[Double](1))),(X($[Double](1,1,1)),Y($[Double](-1))))
-    val perceptron = Perceptron(3,5,1)
+    val perceptron = Perceptron(3,4,2,1)
     perceptron.apprentissage(dataXOrTanHyp, 0.001, 200000)
     println(perceptron($[Double](0,0,1)).toList)
     println(perceptron($[Double](0,1,1)).toList)

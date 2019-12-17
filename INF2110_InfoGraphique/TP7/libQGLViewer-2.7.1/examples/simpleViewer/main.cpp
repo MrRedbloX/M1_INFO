@@ -8,7 +8,7 @@ int main(int argc, char **argv) {
   // Instantiate the viewer.
   View view;
 
-  view.setWindowTitle("This is a giraffe in wireframe flat shadded");
+  view.setWindowTitle("Sphere");
 
   // Make the viewer window visible on screen.
   view.show();

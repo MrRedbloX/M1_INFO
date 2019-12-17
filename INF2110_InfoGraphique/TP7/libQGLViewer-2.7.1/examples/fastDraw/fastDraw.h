@@ -21,11 +21,14 @@
 *****************************************************************************/
 
 #include <QGLViewer/qglviewer.h>
+#include <GL/gl.h>
+#include <GL/glut.h>
 
 class Viewer : public QGLViewer {
 protected:
   virtual void init();
   virtual void draw();
-  virtual void fastDraw();
+  virtual void animate();
   virtual QString helpString() const;
+  float rotate;
 };

@@ -11,4 +11,6 @@ TARGET   = fastDraw
 HEADERS  = fastDraw.h
 SOURCES  = fastDraw.cpp main.cpp
 
+LIBS += -lglut -lGL -lGLU
+
 include( ../examples.pri )

@@ -6,7 +6,8 @@
 TEMPLATE = app
 TARGET   = drawLight
 
-HEADERS  = drawLight.h
-SOURCES  = drawLight.cpp main.cpp
+HEADERS  =
+SOURCES  = main.cpp
+LIBS += -lglut
 
 include( ../examples.pri )

@@ -27,8 +27,9 @@ int main(int argc, char **argv) {
   QApplication application(argc, argv);
 
   Viewer viewer;
+  glutInit(&argc, argv);
 
-  viewer.setWindowTitle("fastDraw");
+  viewer.setWindowTitle("Sphere");
 
   viewer.show();
 

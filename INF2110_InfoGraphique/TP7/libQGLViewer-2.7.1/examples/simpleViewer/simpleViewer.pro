@@ -10,13 +10,10 @@
 
 TEMPLATE = app
 TARGET   = simpleViewer
+LIBS += -lglut
 
 HEADERS  = \
-    glm.h \
-    face.h \
-    objparser.h \
-    vertex.h \
-    view.h
+    vertex.h
 SOURCES  = main.cpp \
     glm.cpp \
     view.cpp \
