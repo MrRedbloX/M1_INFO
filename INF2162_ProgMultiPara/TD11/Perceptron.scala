@@ -2,6 +2,7 @@ import scala.{Array => $}
 import scala.util.Random.{shuffle => shu}
 import scala.math.{abs => abs}
 import scala.math.{exp => e}
+import scala.math.{sin => s}
 class Perceptron(couches_ : $[Int]){
   var oI = (0 until couches_.length).map(i => new $[Double](couches_(i))).toArray
   var iI = (0 until couches_.length).map(i => new $[Double](couches_(i))).toArray
@@ -22,7 +23,7 @@ class Perceptron(couches_ : $[Int]){
     this.oI.last
   }
   def apprentissage(data_ : List[Tuple2[X,Y]], tolerance_ : Double = 0.05, nbItMax_ : Int = 50000) : Unit = {
-    def retroPropag(observe_ : $[Double], souhaite_ : $[Double], pas_ : Double = 0.1) : Unit = {
+    def retroPropag(observe_ : $[Double], souhaite_ : $[Double], pas_ : Double = 0.01) : Unit = {
       //Traitement de la première couche
       for(j <- 0 until couches_(couches_.length-1)){
         this.dI(couches_.length-1)(j) = 2 * (observe_(j)-souhaite_(j)) * Perceptron.fp(this.iI(couches_.length-1)(j)) //Le cas particulier de la couche de sortie
@@ -39,15 +40,20 @@ class Perceptron(couches_ : $[Int]){
       }
     }
     def erreur(ex_ : List[Tuple2[X,Y]]) : Double = ex_.map{ case (X(entree), Y(sortieSouhaitee)) => Perceptron.errQuad(sortieSouhaitee, this(entree))}.sum
-    def apprendreUneFois(ex_ : List[Tuple2[X,Y]]) : Unit = shu(ex_).foreach(e => retroPropag(this(e._1.x_), e._2.y_))
+    def apprendreUneFois(ex_ : List[Tuple2[X,Y]], pas_ : Double) : Unit = shu(ex_).foreach(e => retroPropag(this(e._1.x_), e._2.y_, pas_))
     var nbIt = 0
     var err = 1.0
     println("Start")
-    scala.tools.nsc.io.File("erreur.dat").writeAll("");
+    val filename = "erreur.dat"
+    scala.tools.nsc.io.File(filename).writeAll("");
+    var oldErr = 1.0
+    var pas = 0.1
     while(err > tolerance_ && nbIt < nbItMax_){
+	  if(nbIt % 100 == 0) oldErr = err
+	  if(oldErr < err) pas = pas/10
       err = abs(erreur(data_))
-      apprendreUneFois(data_)
-      scala.tools.nsc.io.File("erreur.dat").appendAll(s"$nbIt $err\n")
+      apprendreUneFois(data_,pas)
+      //scala.tools.nsc.io.File(filename).appendAll(s"$nbIt $err\n")
       nbIt = nbIt + 1
       print(s"\rErreur : $err")
     }
@@ -72,12 +78,19 @@ object Perceptron{
   def apply(couches_ : Int*) : Perceptron = new Perceptron(couches_.toArray)
   def main(args : $[String]) : Unit = {
     val dataXOrTanHyp = List[Tuple2[X,Y]]((X($[Double](0,0,1)),Y($[Double](-1))),(X($[Double](0,1,1)),Y($[Double](1))),(X($[Double](1,0,1)),Y($[Double](1))),(X($[Double](1,1,1)),Y($[Double](-1))))
-    val perceptron = Perceptron(3,4,1)
-    perceptron.apprentissage(dataXOrTanHyp, 0.00001, 10000)
-    println(perceptron($[Double](0,0,1)).toList)
-    println(perceptron($[Double](0,1,1)).toList)
-    println(perceptron($[Double](1,0,1)).toList)
-    println(perceptron($[Double](1,1,1)).toList)
+    val dataXOrSig = List[Tuple2[X,Y]]((X($[Double](0,0,1)),Y($[Double](0))),(X($[Double](0,1,1)),Y($[Double](1))),(X($[Double](1,0,1)),Y($[Double](1))),(X($[Double](1,1,1)),Y($[Double](0))))
+    val perceptron = Perceptron(2,10,5,1)
+    var dataSin = List[Tuple2[X,Y]]()
+    for(i <- -6.28 to 6.28 by 0.1){
+		dataSin = (X($[Double](i,1)),Y($[Double](s(i)))) :: dataSin
+	}
+    perceptron.apprentissage(dataSin, 0.00001, 300000)
+    var res = 0.0
+    scala.tools.nsc.io.File("sinapp.dat").writeAll("");
+    for(i <- -6.28 to 6.28 by 0.2){
+		res = perceptron($[Double](i,1)).head
+		scala.tools.nsc.io.File("sinapp.dat").appendAll(s"$i $res\n")
+	}
   }
 }
 case class X(x_ : $[Double])
