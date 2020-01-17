@@ -22,7 +22,8 @@
 
 #include <QGLViewer/qglviewer.h>
 #include <GL/gl.h>
-#include <GL/glut.h>
+#include "windows.h"
+#include <GL/glu.h>
 
 class Viewer : public QGLViewer {
 protected:
@@ -30,5 +31,9 @@ protected:
   virtual void draw();
   virtual void animate();
   virtual QString helpString() const;
-  float rotate;
+  float rotateSun;
+  float rotateEarth;
+  float rotateEarthFromSun;
+  float rotateMoon;
+  float rotateMoonFromEarth;
 };
