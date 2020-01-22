@@ -8,7 +8,6 @@ var arrPoints = []
 var pointChat = 0 //Voir accès tableau
 
 function dessineEcran(){
-	arrPoints = []
 	cahier.font = "15px Helvetica"
 	cahier.fillStyle = "yellow"
 	cahier.fillRect(0,0,hauteur,largeur)
@@ -30,17 +29,24 @@ function captureClick(event){
 	var x = event.pageX - event.target.offsetLeft
 	var y = event.pageY - event.target.offsetTop
 	if(y <= btnY){
-		if(x <= btnX) dessineEcran()
+		if(x <= btnX){
+			 dessineEcran()
+			 arrPoints = []
+			 pointChat = 0
+		 }
 		else if(x <= btnX*2+15) dessineLignes()
 		else if(x <= btnX*3+30){
 			var chatX = arrPoints[0][0]
 			var chatY = arrPoints[0][1]
+			pointChat = 0
+			dessineEcran()
+			dessineLignes()
 			dessineChat(chatX,chatY)
 		 }
 	}
-	else{
+	else if(x <= hauteur && y <= largeur){
 		arrPoints.push([x,y])
-		console.log(arrPoints)
+		//console.log(arrPoints)
 		cahier.font = "25px Helvetica"
 		cahier.fillStyle = "blue"
 		cahier.fillText(".",x,y)
@@ -67,9 +73,17 @@ function dessineChat(x,y){
 	dessineLignes()
 	var img = document.getElementById("chatmarche");
 	cahier.drawImage(img, x-(img.height/2), y-(img.width/2));
+	document.getElementById("miaou").play()
 	var id = setInterval(dessineChatPointSuivant,1000)
+	pointChat++
 	function dessineChatPointSuivant(){
-		if(pointChat == arrPoints.length){
+		if(pointChat == arrPoints.length-1){
+			dessineEcran()
+			dessineLignes()
+			img = document.getElementById("chatdort");
+			var nextX = arrPoints[pointChat][0]
+			var nextY = arrPoints[pointChat][1]
+			cahier.drawImage(img, nextX-(img.height/2), nextY -(img.width/2))
 			clearInterval(id)
 		}
 		else{
@@ -77,8 +91,8 @@ function dessineChat(x,y){
 			dessineLignes()
 			var nextX = arrPoints[pointChat][0]
 			var nextY = arrPoints[pointChat][1]
-			cahier.drawImage(img, nextX-(img.height/2), nextY -(img.width/2));
-			plusPlusChat()
+			cahier.drawImage(img, nextX-(img.height/2), nextY -(img.width/2))
+			pointChat++
 		}
 	}
 }
