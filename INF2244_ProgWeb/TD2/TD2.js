@@ -6,6 +6,7 @@ var btnX = 125
 var btnY = 40
 var arrPoints = []
 var pointChat = 0 //Voir accès tableau
+var enableClicks = true
 
 function dessineEcran(){
 	cahier.font = "15px Helvetica"
@@ -26,30 +27,33 @@ function dessineEcran(){
 }
 
 function captureClick(event){
-	var x = event.pageX - event.target.offsetLeft
-	var y = event.pageY - event.target.offsetTop
-	if(y <= btnY){
-		if(x <= btnX){
-			 dessineEcran()
-			 arrPoints = []
-			 pointChat = 0
-		 }
-		else if(x <= btnX*2+15) dessineLignes()
-		else if(x <= btnX*3+30){
-			var chatX = arrPoints[0][0]
-			var chatY = arrPoints[0][1]
-			pointChat = 0
-			dessineEcran()
-			dessineLignes()
-			dessineChat(chatX,chatY)
-		 }
-	}
-	else if(x <= hauteur && y <= largeur){
-		arrPoints.push([x,y])
-		//console.log(arrPoints)
-		cahier.font = "25px Helvetica"
-		cahier.fillStyle = "blue"
-		cahier.fillText(".",x,y)
+	if(enableClicks){
+		var x = event.pageX - event.target.offsetLeft
+		var y = event.pageY - event.target.offsetTop
+		if(y <= btnY){
+			if(x <= btnX){
+				 dessineEcran()
+				 arrPoints = []
+				 pointChat = 0
+			 }
+			else if(x <= btnX*2+15) dessineLignes()
+			else if(x <= btnX*3+30){
+				enableClicks = false
+				var chatX = arrPoints[0][0]
+				var chatY = arrPoints[0][1]
+				pointChat = 0
+				dessineEcran()
+				dessineLignes()
+				dessineChat(chatX,chatY)
+			 }
+		}
+		else if(x <= hauteur && y <= largeur){
+			arrPoints.push([x,y])
+			//console.log(arrPoints)
+			cahier.font = "25px Helvetica"
+			cahier.fillStyle = "blue"
+			cahier.fillText(".",x,y)
+		}
 	}
 }
 
@@ -84,6 +88,7 @@ function dessineChat(x,y){
 			var nextX = arrPoints[pointChat][0]
 			var nextY = arrPoints[pointChat][1]
 			cahier.drawImage(img, nextX-(img.height/2), nextY -(img.width/2))
+			enableClicks = true
 			clearInterval(id)
 		}
 		else{
