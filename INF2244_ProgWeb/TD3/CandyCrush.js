@@ -8,51 +8,62 @@ class Model {
     this.gridSize = gridSize
     this.grid = []
     this.points = 0
-    this.traceGrid = [[],[],[]]
+    this.traceGrid = [[],[],[],[]]
     this.igrid = []
     this.cgrid = []
+    this.rgrid = []
+    this.mgrid = []
     this.collapsing = false
     this.loadingDone = false
   }
-  deepCopy(arr_,index_){
+  resetTraceGrid(model_){
+    model_.traceGrid = [[],[],[],[]]
+  }
+  deepCopy(arr_,index_,callback_,args_){
     for(let i=0; i<this.gridSize; i++){
       arr_[i] = []
       for(let j=0; j<this.gridSize; j++){
         arr_[i][j] = this.grid[i][j]
       }
     }
-    this.traceGrid[index_].push(arr_.slice())
+    if(index_ != undefined) this.traceGrid[index_].push(arr_.slice())
+    if(callback_ != undefined) callback_(args_)
   }
   initGrid(){
-
+    this.loadingDone = false
+    this.igrid = []
     for(let i= 0; i<this.gridSize; i++){
       this.grid[i] = []
       for(let j=0; j<this.gridSize; j++){
         this.grid[i][j] = Utility.randInt(1,5)
         if(i == this.gridSize -1 && j == this.gridSize -1){
-          this.deepCopy(this.igrid,0)
-          this.collapseAlignments()
+          this.deepCopy(this.igrid,0,this.collapseAlignments,this)
+          //this.collapseAlignments()
         }
       }
     }
   }
-  collapseAlignments(callback_){
-
-    this.collapsing = false
+  collapseAlignments(model_,callback_){
+    model_.loadingDone = false
+    model_.collapsing = false
+    model_.cgrid = []
     let ret = false
-    for(let i=0; i<this.gridSize; i++){
-      for(let j=0; j<this.gridSize; j++){
-        if(this.grid[i][j] != 0){
-          if(this.checkCollapse(i,j,true)) ret = true
+    for(let i=0; i<model_.gridSize; i++){
+      for(let j=0; j<model_.gridSize; j++){
+        if(model_.grid[i][j] != 0){
+          if(model_.checkCollapse(i,j,true)) ret = true
         }
-        if(i == this.gridSize-1 && j == this.gridSize-1){
+        if(i == model_.gridSize-1 && j == model_.gridSize-1){
           if(callback_ != undefined) {
-            this.loadingDone = true
-            callback_(ret,this.grid)
+            model_.loadingDone = true
+            callback_(ret,model_.grid)
           }
-          if(this.collapsing){
-              this.deepCopy(this.cgrid,1)
-              this.makeCandiesFall()
+          if(model_.collapsing){
+              model_.deepCopy(model_.cgrid,1,model_.makeCandiesFall,model_)
+          }
+          else{
+            model_.deepCopy(model_.cgrid,1)
+            model_.loadingDone = true
           }
         }
       }
@@ -94,35 +105,46 @@ class Model {
     else ret = false
     return ret
   }
-  makeCandiesFall(){
-
-    for(let i=this.gridSize-2; i>=0; i--){
-      for(let j=0; j<this.gridSize; j++){
-        if(this.grid[i][j] != 0 && this.grid[i+1][j] == 0){
-          let ii = i
-          while(ii < this.gridSize-1 && this.grid[ii+1][j] == 0){
-            this.grid[ii+1][j] = this.grid[ii][j]
-            this.grid[ii][j] = 0
-            ii = ii+1
+  makeCandiesFall(model_){
+    model_.mgrid = []
+    model_.revereGrid(model_,function(model_,grid_){
+      for(let i=model_.gridSize-2; i>=0; i--){
+        for(let j=0; j<model_.gridSize; j++){
+          if(grid_[i][j] != 0 && grid_[i+1][j] == 0){
+            console.log("fall")
+            let ii = i
+            let newPos = i+1
+            while(ii < model_.gridSize-1 && grid_[ii+1][j] == 0){
+              grid_[ii+1][j] = grid_[ii][j]
+              grid_[ii][j] = 0
+              newPos = ii+1
+              ii = ii+1
+            }
+            model_.mgrid.push([j,i,j,newPos])
+          }
+          if(i == 0 && j == model_.gridSize-1){
+             model_.traceGrid[2].push(model_.mgrid.slice())
+             model_.refillCandies(model_)
+           }
+        }
+      }
+    })
+  }
+  refillCandies(model_){
+    model_.rgrid = []
+    model_.revereGrid(model_,function(){
+      for(let i=0; i<model_.gridSize; i++){
+        for(let j=0; j<model_.gridSize; j++){
+          if(model_.grid[i][j] == 0){
+            model_.grid[i][j] = Utility.randInt(1,5)
+            model_.rgrid.push([i,j,model_.grid[i][j]])
           }
         }
-        if(i == 0 && j == this.gridSize-1){
-           this.refillCandies()
-         }
       }
-    }
-  }
-  refillCandies(){
-
-    let needToFall = false
-    for(let i=0; i<this.gridSize; i++){
-      for(let j=0; j<this.gridSize; j++){
-        if(this.grid[i][j] == 0){
-          this.grid[i][j] = Utility.randInt(1,5)
-        }
-      }
-    }
-    this.collapseAlignments()
+      model_.traceGrid[3].push(model_.rgrid.slice())
+      //model_.deepCopy(model_.rgrid,3,model_.collapseAlignments,model_)
+      model_.collapseAlignments(model_)
+    })
   }
   swap(i_,j_,pI_,pJ_,callback_){
     let ret = false
@@ -133,8 +155,7 @@ class Model {
         let tmp = this.grid[i_][j_]
         this.grid[i_][j_] = this.grid[ii][jj]
         this.grid[ii][jj] = tmp
-        this.swapCallback =
-        this.collapseAlignments(function(res,grid){
+        this.collapseAlignments(this,function(res,grid){
           if(res) callback_(true)
           else{
             grid[ii][jj] = grid[i_][j_]
@@ -201,6 +222,17 @@ class Model {
     }
     return ret
   }
+  revereGrid(model_,callback_){
+    let tmpGrid = []
+    let ret = model_.grid.slice()
+    for(let i=0; i<model_.gridSize;i++) tmpGrid.push(model_.grid[i].slice())
+    for(let i=0; i<model_.gridSize; i++){
+      for(let j=0; j < model_.gridSize; j++){
+        ret[i][j] = tmpGrid[j][i]
+      }
+    }
+    callback_(model_,ret)
+  }
 }
 
 class Candy{
@@ -247,8 +279,10 @@ class View{
     this.allowClick = true
     this.hasEltSelected = false
     this.selectedCandy = undefined
+    this.loadingDone = false
   }
   initViewGrid(gridModel_){
+    this.loadingDone = false
     for(let i=0; i<gridModel_.length; i++){
       this.viewGrid[i] = []
       for(let j=0; j<gridModel_[i].length; j++){
@@ -276,69 +310,75 @@ class View{
         this.viewGrid[i][j].setDestinationPos(i*this.candySize,j*this.candySize)
       }
     }
+    this.loadingDone = true
   }
-  swapCandies(context_,fromCandy_,toCandy_,view_){
+  swapCandies(fromCandy_,toCandy_,view_,callback_,args_){
+    let context = view_.context
     fromCandy_.destinationPos = toCandy_.currentPos.slice()
     toCandy_.destinationPos = fromCandy_.currentPos.slice()
     view_.allowClick = false
     var t
     function swap(){
       t = setTimeout(function(){
-          context_.clearRect(fromCandy_.currentPos[0], fromCandy_.currentPos[1], view_.candySize, view_.candySize)
-          context_.clearRect(toCandy_.currentPos[0], toCandy_.currentPos[1], view_.candySize, view_.candySize)
+          context.clearRect(fromCandy_.currentPos[0], fromCandy_.currentPos[1], view_.candySize, view_.candySize)
+          context.clearRect(toCandy_.currentPos[0], toCandy_.currentPos[1], view_.candySize, view_.candySize)
           fromCandy_.move()
           toCandy_.move()
-          context_.drawImage(fromCandy_.img,fromCandy_.currentPos[0],fromCandy_.currentPos[1])
-          context_.drawImage(toCandy_.img,toCandy_.currentPos[0],toCandy_.currentPos[1])
+          context.drawImage(fromCandy_.img,fromCandy_.currentPos[0],fromCandy_.currentPos[1])
+          context.drawImage(toCandy_.img,toCandy_.currentPos[0],toCandy_.currentPos[1])
           if(fromCandy_.isMoving() || toCandy_.isMoving())swap()
           else{
             view_.selectedCandy = undefined
             view_.allowClick = true
             view_.hasEltSelected = false
             clearTimeout(t)
+            if(callback_ != undefined) callback_(args_)
           }
         },10)
     }
     swap()
   }
-  collapseCandies(context_,listCandies_,view_,callback_,args){
+  collapseCandies(listCandies_,view_,callback_,args_){
     var t
     view_.allowClick = false
+    let context = view_.context
     function collapse(from_){
       t = setTimeout(function(){
-        context_.fillStyle = "lightblue";
+        context.fillStyle = "lightblue";
         for(let i=0; i<listCandies_.length; i++){
-          context_.fillRect(listCandies_[i].currentPos[0]+from_,listCandies_[i].currentPos[1],1,view_.candySize)
+          context.fillRect(listCandies_[i].currentPos[0]+from_,listCandies_[i].currentPos[1],1,view_.candySize)
         }
         if(from_+1 <= view_.candySize+1) collapse(from_+1)
         else{
           view_.allowClick = true
+          for(let i=0; i<listCandies_.length; i++) listCandies_[i].isCollapse = true
           clearTimeout(t)
-          if(callback_ != undefined) callback_(args[0],args[1],args[2],args[3],args[4])
+          if(callback_ != undefined) callback_(args_)
         }
       },5)
     }
     collapse(-1)
   }
-  fallCandies(context_,listCandies_,view_,callback_,args_){
+  fallCandies(listCandies_,view_,callback_,args_){
     var t
     view_.allowClick = false
+    let context = view_.context
     function fall(from_){
       t = setTimeout(function(){
         let areMoving = false
         for(let i=0; i<listCandies_.length; i++){
-          context_.clearRect(listCandies_[i].currentPos[0], listCandies_[i].currentPos[1], view_.candySize, view_.candySize)
+          context.clearRect(listCandies_[i].currentPos[0], listCandies_[i].currentPos[1], view_.candySize, view_.candySize)
           listCandies_[i].move(Utility.randInt(1,5))
-          context_.drawImage(listCandies_[i].img,listCandies_[i].currentPos[0],listCandies_[i].currentPos[1])
+          context.drawImage(listCandies_[i].img,listCandies_[i].currentPos[0],listCandies_[i].currentPos[1])
           if(listCandies_[i].isMoving()) areMoving = true
         }
         if(areMoving) fall()
         else{
           view_.allowClick = true
           clearTimeout(t)
-          callback_(args_[0],args_[1])
+          if(callback_ != undefined) callback_(args_)
         }
-      },2)
+      },1)
     }
     fall()
   }
@@ -350,77 +390,40 @@ class Controller{
     this.candySize = 88
     this.model = new Model(this.gridSize)
     this.view = new View(this.candySize,"draw")
+    this.currentCollapseGrid = []
+    this.currentFallGrid = []
+    this.currentRefillGrid = []
+    this.currentIndex = -1
   }
   start(){
+    let t
     this.model.initGrid()
-    var t
-    function waitForModel(model_){
+    function waitForModel(control_,model_){
       t = setTimeout(function(){
-        if(!model_.loadingDone) waitForModel(model_)
+        if(!model_.loadingDone) waitForModel(control_,model_)
+        else{
+           clearTimeout(t)
+           console.log(model_.traceGrid)
+           control_.view.initViewGrid(model_.traceGrid[0][0])
+           let p
+           function waitForView(control_,view_){
+             p = setTimeout(function(){
+               if(!view_.loadingDone) waitForView(control_,view_)
+               else{
+                  clearTimeout(p)
+                  control_.collapse(control_)
+                  control_.handleSwap(control_)
+                }
+             },10)
+           }
+           waitForView(control_,control_.view)
+         }
       },10)
     }
-    waitForModel(this.model)
-    console.log(this.model.traceGrid)
-    this.view.initViewGrid(this.model.traceGrid[0][0])
-    this.handleSwap()
-    this.usualTask(0,this)
-
+    waitForModel(this,this.model)
   }
-  usualTask(index_,control_){
-    if(control_.model.traceGrid[1][index_] != undefined){
-      let listToCollapse = []
-      let listToFall = []
-      let collapseList = control_.model.traceGrid[1][index_]
-      for(let i=0; i<collapseList.length; i++){
-        for(let j=collapseList.length-1; j>=0; j--){
-          if(collapseList[i][j] == 0){
-             listToCollapse.push(control_.view.viewGrid[i][j])
-             control_.view.viewGrid[i][j].isCollapse = true
-           }
-           if(j+1 < collapseList.length && collapseList[i][j+1] == 0){
-             let jj = j
-             while(collapseList[i][jj+1] == 0 && jj < collapseList.length) jj = jj+1
-             control_.view.viewGrid[i][j].destinationPos = control_.view.viewGrid[i][jj].currentPos.slice()
-             collapseList[i][jj] = collapseList[i][j]
-             collapseList[i][j] = 0
-             if(!control_.view.viewGrid[i][j].isCollapse){
-               if(listToFall.length == 0) listToFall.push(control_.view.viewGrid[i][j])
-               else{
-                 let isPresent = false
-                 for(let k=0; k<listToFall.length; k++){
-                   if(listToFall[k].currentPos[0] == control_.view.viewGrid[i][j].currentPos[0] && listToFall[k].currentPos[1] == control_.view.viewGrid[i][j].currentPos[1]){
-                     isPresent = true
-                     break
-                   }
-                 }
-                 if(!isPresent) listToFall.push(control_.view.viewGrid[i][j])
-               }
-             }
-           }
-        }
-      }
-      for(let i=0; i<collapseList.length; i++){
-        for(let j=0; j<collapseList.length; j++){
-          if(collapseList[i][j] == 0){
-            let newCandy = new Candy(control_.model.grid[i][j])
-            control_.view.viewGrid[i][j] = newCandy
-            newCandy.currentPos[0] = i * control_.candySize
-            newCandy.currentPos[1] = -control_.candySize
-            newCandy.destinationPos[0] = i * control_.candySize
-            newCandy.destinationPos[1] = j * control_.candySize
-            let img = new Image()
-            img.src = newCandy.imgPath
-            newCandy.img = img
-            listToFall.push(newCandy)
-           }
-        }
-      }
-      control_.view.collapseCandies(control_.view.context,listToCollapse,control_.view,control_.view.fallCandies,[control_.view.context,listToFall,control_.view,control_.usualTask,[index_+1,control_]])
-    }
-  }
-  handleSwap(){
-    var $this = this
-    this.view.canvas.onclick = function(event){
+  handleSwap($this){
+    $this.view.canvas.onclick = function(event){
       if($this.view.allowClick){
         let x = event.pageX - event.target.offsetLeft
     		let y = event.pageY - event.target.offsetTop
@@ -443,24 +446,28 @@ class Controller{
                     if(res){
                       $this.view.viewGrid[i][j] = $this.view.selectedCandy[0]
                       $this.view.viewGrid[$this.view.selectedCandy[1]][$this.view.selectedCandy[2]] = candy
-                      $this.view.swapCandies($this.view.context,$this.view.selectedCandy[0],candy,$this.view)
+                      $this.view.swapCandies($this.view.selectedCandy[0],candy,$this.view,$this.collapse,$this)
                       $this.view.context.clearRect($this.view.selectedCandy[0].currentPos[0], $this.view.selectedCandy[0].currentPos[1], $this.view.candySize, $this.view.candySize)
+                      $this.view.selectedCandy = undefined
+                      $this.view.hasEltSelected = false
                     }
                     else{
-                      $this.view.context.clearRect(xCandy, yCandy, $this.candySize, $this.candySize)
+                      $this.view.context.clearRect($this.view.selectedCandy[0].currentPos[0], $this.view.selectedCandy[0].currentPos[1], $this.view.candySize, $this.view.candySize)
+                      $this.view.context.drawImage($this.view.selectedCandy[0].img,$this.view.selectedCandy[0].currentPos[0],$this.view.selectedCandy[0].currentPos[1])
                       $this.view.context.fillStyle = "red";
                       $this.view.context.fillRect(candy.currentPos[0],candy.currentPos[1],$this.candySize,$this.candySize)
                       $this.view.context.drawImage(candy.img,i*$this.candySize,j*$this.candySize)
                        setTimeout(function(){
                          $this.view.context.clearRect(xCandy, yCandy, $this.candySize, $this.candySize)
                          $this.view.context.drawImage(candy.img,i*$this.candySize,j*$this.candySize)
+                         $this.view.selectedCandy = undefined
+                         $this.view.hasEltSelected = false
                        },50)
                      }
                   })
                 }
               }
               else{
-                console.log("select")
                 $this.view.context.clearRect(xCandy, yCandy, $this.candySize, $this.candySize)
                 $this.view.context.fillStyle = "lightgray";
                 $this.view.context.fillRect(candy.currentPos[0],candy.currentPos[1],$this.candySize,$this.candySize)
@@ -483,6 +490,73 @@ class Controller{
     let k2 = x2_/control_.candySize
     let l2 = y2_/control_.candySize
     control_.model.swap(k1,l1,k2-k1,l2-l1,callback_)
+  }
+  drawGrid(control_){
+
+    control_.view.context.clearRect(0,0,control_.gridSize * control_.candySize,control_.gridSize * control_.candySize)
+    for(let i=0; i<control_.view.viewGrid.length; i++){
+      for(let j=0; j<control_.view.viewGrid[i].length; j++){
+        if(!control_.view.viewGrid[i][j].isCollapse) control_.view.context.drawImage(control_.view.viewGrid[i][j].img,i*control_.candySize,j*control_.candySize)
+      }
+    }
+  }
+  collapse(control_){
+    control_.currentIndex = control_.currentIndex + 1
+    if(control_.model.traceGrid[1][control_.currentIndex] != undefined) control_.currentCollapseGrid = control_.model.traceGrid[1][control_.currentIndex].slice()
+    else control_.currentCollapseGrid = []
+    if(control_.model.traceGrid[2][control_.currentIndex] != undefined) control_.currentFallGrid = control_.model.traceGrid[2][control_.currentIndex].slice()
+    else control_.currentFallGrid = []
+    if(control_.model.traceGrid[3][control_.currentIndex] != undefined) control_.currentRefillGrid = control_.model.traceGrid[3][control_.currentIndex].slice()
+    else control_.currentRefillGrid = []
+    if(control_.currentCollapseGrid.length > 0){
+      let listCandies = []
+      for(let i=0; i<control_.currentCollapseGrid.length; i++){
+        for(let j=0; j<control_.currentCollapseGrid[i].length; j++){
+          if(control_.currentCollapseGrid[i][j] == 0) listCandies.push(control_.view.viewGrid[i][j])
+        }
+      }
+      if(control_.currentFallGrid.length > 0) control_.view.collapseCandies(listCandies,control_.view,control_.fall,control_)
+      else control_.view.collapseCandies(listCandies,control_.view,control_.refill,control_)
+    }
+    else{
+       control_.currentIndex = -1
+       control_.model.resetTraceGrid(control_.model)
+       //if(control_.model.gameOver()) console.log("GAMEOVER")
+     }
+  }
+  fall(control_){
+    let listCandies = []
+    for(let i=0; i<control_.currentFallGrid.length; i++){
+      let currentCandy = control_.view.viewGrid[control_.currentFallGrid[i][0]][control_.currentFallGrid[i][1]]
+      currentCandy.isCollapse = true
+      let destX = control_.view.viewGrid[control_.currentFallGrid[i][2]][control_.currentFallGrid[i][3]].currentPos[0]
+      let destY = control_.view.viewGrid[control_.currentFallGrid[i][2]][control_.currentFallGrid[i][3]].currentPos[1]
+      control_.view.viewGrid[control_.currentFallGrid[i][2]][control_.currentFallGrid[i][3]] = new Candy(currentCandy.id)
+      let destinationCandy = control_.view.viewGrid[control_.currentFallGrid[i][2]][control_.currentFallGrid[i][3]]
+      destinationCandy.setCurrentPos(currentCandy.currentPos[0],currentCandy.currentPos[1])
+      destinationCandy.setDestinationPos(destX,destY)
+      let img = new Image()
+      img.src = destinationCandy.imgPath
+      destinationCandy.img = img
+      listCandies.push(destinationCandy)
+    }
+    control_.view.fallCandies(listCandies,control_.view,control_.refill,control_)
+  }
+  refill(control_){
+    let listCandies = []
+    for(let i=0; i< control_.currentRefillGrid.length; i++){
+      let x = control_.currentRefillGrid[i][0]
+      let y = control_.currentRefillGrid[i][1]
+      let newCandy = new Candy(control_.currentRefillGrid[i][2])
+      control_.view.viewGrid[x][y] = newCandy
+      let img = new Image()
+      img.src = newCandy.imgPath
+      newCandy.img = img
+      newCandy.setCurrentPos(x * control_.candySize, -control_.candySize)
+      newCandy.setDestinationPos(x * control_.candySize, y * control_.candySize)
+      listCandies.push(newCandy)
+    }
+    control_.view.fallCandies(listCandies,control_.view,control_.collapse,control_)
   }
 }
 
