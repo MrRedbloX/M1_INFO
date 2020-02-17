@@ -108,7 +108,7 @@ int main(int argc,char *argv[]){
     float vector_Y1[N] __attribute__((aligned(32))), 
           vector_Y2[N] __attribute__((aligned(32))), 
           vector_Y[N] __attribute__((aligned(32))),
-          vector_X[N]__attribute__((aligned(32))) ;
+          vector_X[N] __attribute__((aligned(32))) ;
     float SA;
     
     if (argc<2){
