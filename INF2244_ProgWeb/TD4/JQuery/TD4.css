@@ -1,0 +1,27 @@
+.red {
+ color: #FF0000;
+}
+.blue {
+ color: #0000FF;
+}
+.black {
+ color: #000000;
+}
+
+#ladiv {
+   border-style: solid;
+   border-color: blue;
+   background-color: gray;
+   color: yellow;
+}
+
+#ladiv2 {
+  border-style: solid;
+  border-color: blue;
+  background-color: gray;
+  color: red;
+}
+
+.draggable{
+  cursor: pointer;
+}
