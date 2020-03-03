@@ -1,0 +1,43 @@
+.scene{
+  background-image: url("./TD5_kit/images/fond.png");
+  padding: 10px;
+  overflow: hidden;
+  display:flex;
+  width: 940px;
+  position: relative;
+}
+
+.central{
+  width: : 50%;
+}
+
+.imgG{
+  width: 12.5%;
+  overflow: hidden;
+  float: left;
+}
+
+.imgD{
+  width: 12.5%;
+  overflow: hidden;
+  float: right;
+}
+
+.volet{
+  cursor: pointer;
+  position: relative;
+}
+
+.txtbulle{
+  position: absolute;
+  background-color: rgba(0,0,0,0.5);
+  color: white;
+  padding-left: 5px;
+  top: 70%;
+  left: 5px;
+  right: 5px;
+}
+
+.panneauTxt{
+  display: none;
+}
