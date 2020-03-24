@@ -1,0 +1,36 @@
+doctype html
+html
+  head
+    meta(charset='utf-8')
+    title Test
+    link(rel='stylesheet', type='text/css', href='/css/style.css')
+    link(href='https://fonts.googleapis.com/css?family=Open+Sans:300', rel='stylesheet', type='text/css')
+    script(src='https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js')
+  body
+    .container
+    script.
+      function compute(){
+        $.get("/"+$("#user").val()+"/distance?a="+$("#a").val()+"&b="+$("#b").val(),(data) =>{
+          if(data.erreur != undefined) alert(data.erreur)
+          else if(data.utilisateur != undefined){
+            $("body").append("<p>Heure mesure : "+data.date+"</p>")
+            $("body").append("<p>A : "+data.A+"</p>")
+            $("body").append("<p>B : "+data.B+"</p>")
+            $("body").append("<p>Distance : "+data.distance+"</p>")
+            $("body").append("<p>Temps calcul : "+data.tempsDeCalculEnMs+" ms</p>")
+            $("body").append("<p>Nombre de requête(s) effectuée(s) : "+data.interrogationsMinute+"</p>")
+            $("body").append("<br>")
+          }
+          else{
+            alert("Paramètres non corrects")
+          }
+        })
+      }
+    fieldset
+      input.ghost-input(id='user', type='text', placeholder='Username', required='')
+      input.ghost-input(id='pass', type='password', placeholder='Password', required='')
+      input.ghost-input(id='a', type='text', placeholder='A', required='')
+      input.ghost-input(id='b', type='text', placeholder='B', required='')
+      input.ghost-button(type='submit', value='Compute', onclick="compute()")
+      if error
+        p= error
