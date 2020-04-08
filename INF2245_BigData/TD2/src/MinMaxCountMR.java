@@ -43,7 +43,7 @@ public class MinMaxCountMR {
         //Chemin du fichier à lire
         FileInputFormat.setInputPaths(job, new Path("/data/stackoverflow/Comments.xml"));
 
-        FileSystem hdfs = FileSystem.get(new URI("hdfs://hnn:8088"), conf);
+        FileSystem hdfs = FileSystem.get(new URI("hdfs://hnn:9000"), conf);
 
         //Chemin de sortie
         Path output_path= new Path("output-minmaxcount");
