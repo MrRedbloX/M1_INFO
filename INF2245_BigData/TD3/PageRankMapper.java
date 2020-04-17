@@ -1,47 +1,26 @@
 package pagerank;
 
 import java.io.IOException;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import org.apache.hadoop.io.IntWritable;
-import org.apache.hadoop.io.LongWritable;
+import java.util.ArrayList;
+import java.util.Arrays;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Mapper;
 
-public class PageRankMapper extends Mapper<LongWritable, Text, Text, IntWritable> {
+public class PageRankMapper extends Mapper<Text, TupleWritable, Text, TupleWritable> {
+	public static enum MapCounters {
+		PAGE_CNT
+	}
 
-  private Pattern pattern_regexp;
-  private static final Pattern pattern_word = Pattern.compile("\\w+");
-  private static final IntWritable ONE=new IntWritable(1);
-
-  public static enum MapCounters {
-    PAGE_CNT, // nombre de mots qui ont été trouvés
-  };
-
-  @Override
-  public void setup(Context context) {
-
-    pattern_regexp = Pattern.compile(context.getConfiguration().get("regex"));
-  }
-
-  @Override
-  public void map(LongWritable key, Text value, Context context)
-        throws IOException, InterruptedException {
-
-    Matcher match = pattern_word.matcher(value.toString());
-    while (match.find()) {
-      String word = match.group().toLowerCase();
-      if (pattern_regexp.matcher(word).matches()){
-        context.write(new Text(word), ONE);
-        context.getCounter(MapCounters.PAGE_CNT).increment(1);
-      }
-    }
-  }
-
-  @Override
-  public void cleanup(Context context) {
-  }
-
-
+	public void map(Text key, TupleWritable value, Context context) throws IOException, InterruptedException {
+		context.getCounter(MapCounters.PAGE_CNT).increment(1);
+		String[] val = value.get();
+		String[] valTmp = new String[val.length-1];
+		System.arraycopy(val, 1, valTmp, 0, valTmp.length);
+		ArrayList<String> links = new ArrayList<String>(Arrays.asList(valTmp));
+		int totalLinks = links.size();
+		for(String link : links) {
+			context.write(new Text(link), new TupleWritable(key.toString(), "1.0", String.valueOf(totalLinks)));
+		}
+		context.write(key, value);
+	}
 }

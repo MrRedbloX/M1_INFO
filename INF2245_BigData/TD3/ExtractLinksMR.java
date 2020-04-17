@@ -49,7 +49,7 @@ public class ExtractLinksMR {
       args= new String[]{
           //"/data/wikipedia/frwiki-pages-100-articles.xml", //          100 pages
           //"frwiki-links-100-articles",                     //       20 147 links
-          "/data/wikipedia/frwiki-pages-1000-articles.xml",  //        1 000 pages
+          "/data/wikipedia/frwiki-pages-1000-articles.xml.xml",  //        1 000 pages
           "frwiki-links-1000-articles",                      //      204 331 links
           //"/data/wikipedia/frwiki-pages-10000-articles.xml",//      10 000 pages
           //"frwiki-links-10000-articles",                     //  1 770 142 links

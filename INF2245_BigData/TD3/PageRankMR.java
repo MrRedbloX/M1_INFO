@@ -34,7 +34,7 @@ public class PageRankMR {
 
   //a executer par : hadoop jar pagerank.jar pagerank.PageRankMR
   //suivi de manière optionnelle par les chemins d'entrées et de sortie
-
+  
   public static void main(String[] args) {
 
     if ((args == null) || args.length==0){

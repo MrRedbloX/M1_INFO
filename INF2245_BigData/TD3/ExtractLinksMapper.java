@@ -1,48 +1,32 @@
 package pagerank;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import org.apache.hadoop.io.IntWritable;
-import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Mapper;
 
-public class ExtractLinksMapper extends Mapper<LongWritable, Text, Text, IntWritable> {
+public class ExtractLinksMapper extends Mapper<Text, Text, Text, TupleWritable> {
+	private static Pattern pattern = Pattern.compile("\\[\\[[^\\]]+\\]\\]");
 
-  private Pattern pattern_regexp;
-  private static final Pattern pattern_word = Pattern.compile("\\w+");
-  private static final IntWritable ONE=new IntWritable(1);
-
-  public static enum MapCounters {
-    PAGE_CNT,
-    LINK_CNT,
-  };
-
-  @Override
-  public void setup(Context context) {
-
-    pattern_regexp = Pattern.compile(context.getConfiguration().get("regex"));
-  }
-
-  @Override
-  public void map(LongWritable key, Text value, Context context)
-        throws IOException, InterruptedException {
-
-    Matcher match = pattern_word.matcher(value.toString());
-    while (match.find()) {
-      String word = match.group().toLowerCase();
-      if (pattern_regexp.matcher(word).matches()){
-        context.write(new Text(word), ONE);
-        context.getCounter(MapCounters.PAGE_CNT).increment(1);
-      }
-    }
-  }
-
-  @Override
-  public void cleanup(Context context) {
-  }
-
-
+	public static enum MapCounters {
+		PAGE_CNT,
+		LINK_CNT,
+	}
+	
+	public void map(Text key, Text value, Context context) throws IOException, InterruptedException {
+		context.getCounter(MapCounters.PAGE_CNT).increment(1);
+		ArrayList<String> list = new ArrayList<String>();
+		list.add("1.0");
+		Matcher matcher = pattern.matcher(value.toString());
+		while(matcher.find()) {
+			String link = matcher.group().toLowerCase();
+			if (pattern.matcher(link).matches()) {
+				list.add(link);
+				context.getCounter(MapCounters.LINK_CNT).increment(1);
+			}
+		}
+		context.write(key, new TupleWritable(list.toArray(new String[0])));
+	}
 }

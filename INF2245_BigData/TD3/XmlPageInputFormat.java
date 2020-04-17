@@ -1,4 +1,4 @@
-  /**
+/**
  * Lecteur d'articles de wikipédia au format XML
  * produit des couples (nom de la page, contenu de la page)
  * NE PAS MODIFIER
@@ -34,7 +34,7 @@ public class XmlPageInputFormat extends FileInputFormat<Text, Text> {
   /**
    * XMLRecordReader class to read through a given xml document to output xml blocks as records as
    * specified by the start tag and end tag
-   *
+   * 
    */
   static final byte[] startPageTag = "<page>".getBytes();
 
@@ -45,9 +45,8 @@ public class XmlPageInputFormat extends FileInputFormat<Text, Text> {
   static final byte[] endTitleTag = "</title>".getBytes();;
 
   public static class XmlRecordReader extends RecordReader<Text, Text> {
-
-    long start;
-
+    
+	long start;
     long end;
 
     FSDataInputStream fsin;
