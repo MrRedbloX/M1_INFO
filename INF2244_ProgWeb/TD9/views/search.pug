@@ -1,0 +1,25 @@
+doctype html
+html
+  head
+    meta(charset='utf-8')
+    title Search
+    link(href='https://fonts.googleapis.com/css?family=Open+Sans:300', rel='stylesheet', type='text/css')
+    script(src='https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js')
+  body
+    script.
+      $(document).ready(() => {
+        res = !{data}
+        $("body").append("<h3>"+res.length+" result(s).</h3> <ul>")
+        res.forEach(elt =>{
+          if(elt.addresses.length == 1) $("body").append("<li> "+elt._id.name+" : "+elt.addresses[0].building+" "+elt.addresses[0].street+" "+elt.addresses[0].zipcode+" ("+elt._id.borough.toUpperCase()+")"+"</li>")
+          else{
+            str = "<li>"+elt._id.name+" ("+elt._id.borough.toUpperCase()+")"+" : <ul>"
+            elt.addresses.forEach(add =>{
+              str += " <li> "+add.building+" "+add.street+" "+add.zipcode+"</li>"
+            })
+            str += "</ul> </li>"
+            $("body").append(str)
+          }
+        })
+        $("body").append("</ul>")
+      })

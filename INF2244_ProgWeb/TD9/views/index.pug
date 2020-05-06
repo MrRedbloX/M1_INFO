@@ -1,0 +1,43 @@
+doctype html
+html
+  head
+    meta(charset='utf-8')
+    title Restaurants
+    link(href='https://fonts.googleapis.com/css?family=Open+Sans:300', rel='stylesheet', type='text/css')
+    script(src='https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js')
+  body
+    h1 Restaurants
+    p= total
+    script.
+      function find(){
+        uri = "/noms/"
+        quartier = $("#quartier").val()
+        cuisine = $("#cuisine").val()
+        if(cuisine == undefined || cuisine == "") alert("Cuisine needs to be fill.")
+        else{
+          if(quartier != undefined && quartier != "") uri += quartier+"/"
+          uri += cuisine
+          location.href = uri
+        }
+      }
+      function near(){
+        x = $("#x").val()
+        y = $("#y").val()
+        if(x == undefined || y == undefined || x == "" || y == "") alert("Wrong format for X or Y")
+        else location.href = "/distance?x="+x+"&y="+y
+      }
+    h3 Find
+    fieldset
+      input.ghost-input(id='cuisine', type='text', placeholder='Cuisine')
+      input.ghost-input(id='quartier', type='text', placeholder='Borough')
+      input.ghost-button(type='submit', value='Search', onclick="find()")
+      if error
+        p= error
+
+    h3 Nearest restaurant from...
+    fieldset
+      input.ghost-input(id='x', type='number', placeholder='X')
+      input.ghost-input(id='y', type='number', placeholder='Y')
+      input.ghost-button(type='submit', value='Search', onclick="near()")
+      if error
+        p= error
